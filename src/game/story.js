@@ -98,15 +98,16 @@
       f.aldric_forgave ? 'Aldric was heard at the top of the stairs, singing one verse of his own.' : 'Aldric keeps his vigil, for a brother who never answered.',
       f.ilse_done ? 'Ilse carved twelve names over the chapel stair and left the door unlocked.' : 'Ilse still guards a stair nobody is asking to descend.',
       f.corwin_dogs_done ? 'Corwin named the dogs again, out loud, by the fire.' : 'Corwin hunts quieter things than he used to.',
-      f.marta_trust ? 'Marta burned the last page of the ledger, and slept.' : 'Marta keeps her door barred, and her wolfsbane drying.'];
+      f.marta_trust ? 'Marta burned the last page of the ledger, and slept.' : 'Marta keeps her door barred, and her wolfsbane drying.']
+      .concat((AH.CovenFates ? AH.CovenFates() : []).filter(Boolean));
     if (this.t > 1) {
       const big = Font.big('THE DROWNED ROAD', 4, '#f6e2a8', '#a87a30', '#1a0e04'); g2.globalAlpha = U.clamp(this.t - 1, 0, 1); g2.drawImage(big, Math.round(W / 2 - big.width / 2), 22);
       Font.wrap(L, 340).forEach((l, i) => Font.draw(g2, l, W / 2, 70 + i * 11, C.ink, { align: 'center', outline: '#05040a' }));
-      fates.forEach((l, i) => { g2.globalAlpha = U.clamp(this.t - 2.2 - i * 0.45, 0, 1) * U.clamp(this.t - 1, 0, 1); Font.draw(g2, l, W / 2, 118 + i * 14, i % 2 ? '#b8aa90' : '#d4c8a8', { align: 'center', outline: '#05040a' }); });
+      fates.forEach((l, i) => { g2.globalAlpha = U.clamp(this.t - 2.2 - i * 0.45, 0, 1) * U.clamp(this.t - 1, 0, 1); Font.draw(g2, l, W / 2, 110 + i * 12.5, i % 2 ? '#b8aa90' : '#d4c8a8', { align: 'center', outline: '#05040a' }); });
       g2.globalAlpha = U.clamp(this.t - 1, 0, 1);
-      Font.draw(g2, 'End of the vertical slice. Thank you for playing.', W / 2, 196, C.gold, { align: 'center', outline: '#05040a' });
-      Font.draw(g2, 'Level ' + Gm.level + '   Day ' + Gm.day + '   Slain ' + Gm.kills + '   Deaths ' + Gm.deaths, W / 2, 210, C.dim, { align: 'center' });
-      if (this.t > 5) Font.draw(g2, '[Enter] return to title', W / 2, 238, '#5a5448', { align: 'center' }); g2.globalAlpha = 1;
+      Font.draw(g2, 'End of the vertical slice. Thank you for playing.', W / 2, 200, C.gold, { align: 'center', outline: '#05040a' });
+      Font.draw(g2, 'Level ' + Gm.level + '   Day ' + Gm.day + '   Slain ' + Gm.kills + '   Deaths ' + Gm.deaths, W / 2, 214, C.dim, { align: 'center' });
+      if (this.t > 5) Font.draw(g2, '[Enter] return to title', W / 2, 240, '#5a5448', { align: 'center' }); g2.globalAlpha = 1;
     }
   };
   if (SC && SC.epilogue) SC.epilogue.update = function (dt, Gm) { this.t += dt; AH.Particles.update(dt); if (this.t > 5 && AH.Input.pressed('confirm')) { Gm.mode = 'title'; Gm.screen = null; this.t = 0; AH.Audio.music('title'); } };

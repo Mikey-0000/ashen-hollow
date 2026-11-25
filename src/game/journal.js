@@ -31,6 +31,9 @@
     { id: 'corwin', title: 'Ash, Tansy and Brute', who: 'Corwin', show: () => F('corwin_dogs'), steps: [
       ['Put down three Hollow Hounds.', () => F('corwin_dogs_done') || ((G().seen.hound || 0) - (G().flags.corwin_hound_base || 0)) >= 3], ['Tell Corwin.', () => F('corwin_dogs_done')]], done: () => F('corwin_dogs_done'),
       note: () => (F('corwin_dogs_done') ? '' : Math.min(3, (G().seen.hound || 0) - (G().flags.corwin_hound_base || 0)) + ' of 3 laid to rest.') },
+    { id: 'cold', title: 'The Cold Hearth', who: 'Vesna / Marta', show: () => F('cold_hearth'), steps: [
+      ["Find Marta's three torn pages in the Thornwood.", () => [1, 2, 3].every((i) => (G().lore || {})['red_page_' + i])], ['Decide whose hands they belong in.', () => F('cold_resolved')]], done: () => F('cold_resolved'),
+      note: () => ({ reconcile: 'You carried her apology. The ninth fire is lit.', burn: 'You burned them with Marta.', expose: 'You gave them to Vesna.' }[G().flags.cold_resolved] || ('Pages found: ' + [1, 2, 3].filter((i) => (G().lore || {})['red_page_' + i]).length + '/3.' + (F('cold_carry') ? ' Carrying Marta\'s apology to Vesna.' : ''))) },
     { id: 'brothers', title: "The Abbot's Brother", who: 'Aldric', show: () => F('aldric_stance') || F('abbot_hint'), steps: [
       ["Find what the Abbot wrote in the lowest hall.", () => !!(G().lore || {}).abbot_journal], ['Read it to Aldric.', () => F('aldric_forgave')]], done: () => F('aldric_forgave'),
       note: () => (F('aldric_forgave') ? 'Aldric forgave him. He asked you to carry the message.' : '') },
