@@ -97,7 +97,8 @@
         const mine = this.allies.find((a) => a.companion);
         if (!on) { if (mine) mine.remove = true; return r; }
         if (!mine) { respawn -= dt; if (respawn <= 0) { respawn = 12; spawn(this); } }
-        else if (U.dist(mine.x, mine.y, Gm.player.x, Gm.player.y) > 150) { mine.x = Gm.player.x - 14; mine.y = Gm.player.y + 4; }
+        else if (!mine.dead) { mine._bow = (mine._bow || 0) - dt; if (mine._bow <= 0) { let best = null, bd = 150; this.enemies.forEach((e) => { if (e.dead || e.dormant || e.ally || e.def.passive) return; const d = U.dist(e.x, e.y, mine.x, mine.y); if (d < bd && !this.opaqueAt((e.x + mine.x) / 2, (e.y + mine.y) / 2)) { bd = d; best = e; } }); if (best) { mine._bow = 1.15; this.projectiles.push(new Arrow(this, mine, best)); AH.Audio.sfx('whoosh', { v: 0.25 }); } else mine._bow = 0.3; } }
+        if (mine && U.dist(mine.x, mine.y, Gm.player.x, Gm.player.y) > 150) { mine.x = Gm.player.x - 14; mine.y = Gm.player.y + 4; }
       } catch (e) { if (AH.reportError) AH.reportError(e); }
       return r;
     };
@@ -105,6 +106,15 @@
   function spawn(w) {
     const Gm = w.G, p = Gm.player, e = AH.makeThrall(w, p.x - 16, p.y + 4, 1e9, 8 + Gm.level * 0.9);
     e.companion = true; e.def = Object.assign({}, AH.EnemyDefs.thrall, { ally: true, name: 'Corwin', speed: 66 }); e.hp = e.maxHp = 80 + Gm.level * 6; e.fade = 0.4; w.allies.push(e);
+  }
+  /* Corwin's arrows */
+  class Arrow {
+    constructor(w, from, to) { this.w = w; this.x = from.x; this.y = from.y - 10; const a = Math.atan2(to.y - to.def.h * 0.4 - this.y, to.x - this.x); this.ang = a; this.vx = Math.cos(a) * 260; this.vy = Math.sin(a) * 260; this.life = 0.9; this.dead = false; this.dmg = 9 + w.G.level * 1.2; this.z = 0; }
+    update(dt) {
+      this.life -= dt; this.x += this.vx * dt; this.y += this.vy * dt; if (this.life <= 0 || this.w.opaqueAt(this.x, this.y)) { this.dead = true; return; }
+      for (const e of this.w.enemies) { if (e.dead || e.dormant || e.ally) continue; if (U.dist(this.x, this.y, e.x, e.y - e.def.h * 0.4) < e.r + 3) { AH.Combat.hit(e, this.dmg, { src: this.w.G.player, ang: this.ang, silent: false, big: false }); e.shove && e.shove(this.ang, 30); this.dead = true; return; } }
+    }
+    draw(g, cam) { const x = this.x - cam.x, y = this.y - cam.y, c = Math.cos(this.ang), s = Math.sin(this.ang); g.strokeStyle = '#d8c090'; g.lineWidth = 1; g.beginPath(); g.moveTo(x - c * 6, y - s * 6); g.lineTo(x + c * 3, y + s * 3); g.stroke(); g.fillStyle = '#e8ecf4'; g.fillRect(Math.round(x + c * 3), Math.round(y + s * 3), 1, 1); }
   }
   const En = AH.Enemy, spr0 = En.prototype.sprite, draw0 = En.prototype.draw;
   En.prototype.sprite = function () {

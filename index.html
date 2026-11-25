@@ -199,12 +199,14 @@
           <div class="row"><span>Skill tree</span><span><kbd>T</kbd></span></div>
           <div class="row"><span>Map &amp; waystones</span><span><kbd>M</kbd></span></div>
           <div class="row"><span>Codex (lore found)</span><span><kbd>N</kbd></span></div>
+          <div class="row"><span>Journal (quests, companion)</span><span><kbd>G</kbd></span></div>
+          <div class="row"><span>Picture mode (smooth / soft / crisp)</span><span><kbd>F2</kbd></span></div>
           <div class="row"><span>Pause / save / settings</span><span><kbd>Esc</kbd> <kbd>P</kbd></span></div>
           <div class="row"><span>Change tab in the book</span><span><kbd>Q</kbd> <kbd>R</kbd> <kbd>Tab</kbd></span></div>
           <div class="row"><span>Confirm / back in menus</span><span><kbd>Enter</kbd> / <kbd>Esc</kbd></span></div>
         </div>
       </div>
-      <div class="note">A gamepad (left stick to move, face buttons to act) is wired in but has not been tested on real hardware. Every menu works from the keyboard. The game autosaves every few minutes; the pause menu holds three save slots.</div>
+      <div class="note">A gamepad (left stick to move, face buttons to act) is wired in but has not been tested on real hardware. Every menu works from the keyboard and with the mouse (hover to highlight, click to choose, right-click to go back, wheel to scroll, click the spell slots to select them). The game autosaves every few minutes; the pause menu holds three save slots.</div>
     </section>
 
     <section class="page" id="t2">
@@ -320,52 +322,52 @@
 </div>
 
 <script>window.AH = { };</script>
-<script src="src/core/util.js?v=20261125n"></script>
-<script src="src/core/font.js?v=20261125n"></script>
-<script src="src/core/input.js?v=20261125n"></script>
-<script src="src/core/audio.js?v=20261125n"></script>
-<script src="src/core/sprites.js?v=20261125n"></script>
-<script src="src/core/hires.js?v=20261125n"></script>
-<script src="src/core/particles.js?v=20261125n"></script>
-<script src="src/core/lighting.js?v=20261125n"></script>
-<script src="src/core/present.js?v=20261125n"></script>
-<script src="src/core/weather.js?v=20261125n"></script>
-<script src="src/game/art.js?v=20261125n"></script>
-<script src="src/game/art2.js?v=20261125n"></script>
-<script src="src/game/art3.js?v=20261125n"></script>
-<script src="src/game/tiles.js?v=20261125n"></script>
-<script src="src/game/props.js?v=20261125n"></script>
-<script src="src/data/icons.js?v=20261125n"></script>
-<script src="src/data/items.js?v=20261125n"></script>
-<script src="src/data/spells.js?v=20261125n"></script>
-<script src="src/data/skills.js?v=20261125n"></script>
-<script src="src/data/lore.js?v=20261125n"></script>
-<script src="src/data/arsenal.js?v=20261125n"></script>
-<script src="src/data/enemies.js?v=20261125n"></script>
-<script src="src/data/maps.js?v=20261125n"></script>
-<script src="src/game/clutter.js?v=20261125n"></script>
-<script src="src/data/dialogue.js?v=20261125n"></script>
-<script src="src/game/combat.js?v=20261125n"></script>
-<script src="src/game/state.js?v=20261125n"></script>
-<script src="src/game/player.js?v=20261125n"></script>
-<script src="src/game/enemy.js?v=20261125n"></script>
-<script src="src/game/boss.js?v=20261125n"></script>
-<script src="src/game/magic.js?v=20261125n"></script>
-<script src="src/game/elements.js?v=20261125n"></script>
-<script src="src/game/objects.js?v=20261125n"></script>
-<script src="src/game/life.js?v=20261125n"></script>
-<script src="src/game/world.js?v=20261125n"></script>
-<script src="src/game/living.js?v=20261125n"></script>
-<script src="src/game/vfx.js?v=20261125n"></script>
-<script src="src/game/ambience.js?v=20261125n"></script>
-<script src="src/ui/skin.js?v=20261125n"></script>
-<script src="src/ui/hud.js?v=20261125n"></script>
-<script src="src/ui/screens.js?v=20261125n"></script>
-<script src="src/game/polish.js?v=20261125n"></script>
-<script src="src/ui/mouse.js?v=20261125n"></script>
-<script src="src/game/journal.js?v=20261125n"></script>
-<script src="src/game/cheats.js?v=20261125n"></script>
-<script src="src/main.js?v=20261125n"></script>
-<script src="src/shell.js?v=20261125n"></script>
+<script src="src/core/util.js?v=20261125o"></script>
+<script src="src/core/font.js?v=20261125o"></script>
+<script src="src/core/input.js?v=20261125o"></script>
+<script src="src/core/audio.js?v=20261125o"></script>
+<script src="src/core/sprites.js?v=20261125o"></script>
+<script src="src/core/hires.js?v=20261125o"></script>
+<script src="src/core/particles.js?v=20261125o"></script>
+<script src="src/core/lighting.js?v=20261125o"></script>
+<script src="src/core/present.js?v=20261125o"></script>
+<script src="src/core/weather.js?v=20261125o"></script>
+<script src="src/game/art.js?v=20261125o"></script>
+<script src="src/game/art2.js?v=20261125o"></script>
+<script src="src/game/art3.js?v=20261125o"></script>
+<script src="src/game/tiles.js?v=20261125o"></script>
+<script src="src/game/props.js?v=20261125o"></script>
+<script src="src/data/icons.js?v=20261125o"></script>
+<script src="src/data/items.js?v=20261125o"></script>
+<script src="src/data/spells.js?v=20261125o"></script>
+<script src="src/data/skills.js?v=20261125o"></script>
+<script src="src/data/lore.js?v=20261125o"></script>
+<script src="src/data/arsenal.js?v=20261125o"></script>
+<script src="src/data/enemies.js?v=20261125o"></script>
+<script src="src/data/maps.js?v=20261125o"></script>
+<script src="src/game/clutter.js?v=20261125o"></script>
+<script src="src/data/dialogue.js?v=20261125o"></script>
+<script src="src/game/combat.js?v=20261125o"></script>
+<script src="src/game/state.js?v=20261125o"></script>
+<script src="src/game/player.js?v=20261125o"></script>
+<script src="src/game/enemy.js?v=20261125o"></script>
+<script src="src/game/boss.js?v=20261125o"></script>
+<script src="src/game/magic.js?v=20261125o"></script>
+<script src="src/game/elements.js?v=20261125o"></script>
+<script src="src/game/objects.js?v=20261125o"></script>
+<script src="src/game/life.js?v=20261125o"></script>
+<script src="src/game/world.js?v=20261125o"></script>
+<script src="src/game/living.js?v=20261125o"></script>
+<script src="src/game/vfx.js?v=20261125o"></script>
+<script src="src/game/ambience.js?v=20261125o"></script>
+<script src="src/ui/skin.js?v=20261125o"></script>
+<script src="src/ui/hud.js?v=20261125o"></script>
+<script src="src/ui/screens.js?v=20261125o"></script>
+<script src="src/game/polish.js?v=20261125o"></script>
+<script src="src/ui/mouse.js?v=20261125o"></script>
+<script src="src/game/journal.js?v=20261125o"></script>
+<script src="src/game/cheats.js?v=20261125o"></script>
+<script src="src/main.js?v=20261125o"></script>
+<script src="src/shell.js?v=20261125o"></script>
 </body>
 </html>

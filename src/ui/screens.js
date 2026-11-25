@@ -49,7 +49,7 @@
       UI.drawTitleScene(g, title.t); AH.Particles.draw(g, { x: 0, y: 0 }, true);
       const big = Font.big('ASHEN HOLLOW', 5, '#f6e2a8', '#a87a30', '#1a0e04'); g.drawImage(big, Math.round(W / 2 - big.width / 2), 18);
       Font.draw(g, 'A  TALE  OF  FORGOTTEN  GODS', W / 2, 78, '#9a8e74', { align: 'center', outline: '#05040a' });
-      if (title.sub === 'ctl') { UI.panel(g, 70, 60, 340, 160, { title: 'Controls' }); const L = [['Move', 'WASD / Arrows / Left stick'], ['Attack (3-hit combo)', 'J / Z / Left click'], ['Dodge (i-frames)', 'Space / K / X'], ['Cast readied spell', 'L / C / Right click'], ['Interact / Speak', 'E / F'], ['Cycle spell / pick slot', 'Q R / 1-4'], ['Book: items, spells, skills, map, codex', 'I B T M N'], ['Pause', 'Esc / P'], ['Aim  /  Witchsight (hold)', 'Mouse  /  V']]; L.forEach((r, i) => { Font.draw(g, r[0], 86, 76 + i * 15, C.ink); Font.draw(g, r[1], 394, 76 + i * 15, C.gold, { align: 'right' }); }); Font.draw(g, 'Dodge just before a telegraphed blow lands for a perfect dodge.', 240, 208, C.dim, { align: 'center' }); return; }
+      if (title.sub === 'ctl') { UI.panel(g, 70, 56, 340, 170, { title: 'Controls' }); const L = [['Move', 'WASD / Arrows / Left stick'], ['Attack (3-hit combo)', 'J / Z / Left click'], ['Dodge (i-frames)', 'Space / K / X'], ['Cast readied spell', 'L / C / Right click'], ['Interact / Speak', 'E / F'], ['Cycle spell / pick slot', 'Q R / 1-8'], ['Book: items, spells, skills, map, codex, journal', 'I B T M N G'], ['Pause', 'Esc / P'], ['Aim  /  Witchsight (hold)', 'Mouse  /  V'], ['Menus with the mouse', 'click, right-click = back']]; L.forEach((r, i) => { Font.draw(g, r[0], 86, 74 + i * 14, C.ink); Font.draw(g, r[1], 394, 74 + i * 14, C.gold, { align: 'right' }); }); Font.draw(g, 'Dodge just before a telegraphed blow lands for a perfect dodge.', 240, 212, C.dim, { align: 'center' }); return; }
       if (title.sub === 'load') { SC.saves.draw(g, Gm, time, 'load'); return; }
       const items = title.items || []; UI.menu(g, items, title.sel, W / 2 - 60, 110, 120, time, { align: 'center', lh: 16 });
       Font.draw(g, AH.VERSION + '  -  vertical slice', 6, H - 10, '#5a5448'); Font.draw(g, 'Arrows / Enter', W - 6, H - 10, '#5a5448', { align: 'right' });
@@ -229,7 +229,7 @@
     },
     draw(g, Gm, time) {
       g.fillStyle = 'rgba(5,4,10,0.7)'; g.fillRect(0, 0, W, H);
-      if (this.sub === 'ctl') { UI.panel(g, 70, 60, 340, 150, { title: 'Controls' }); [['Move', 'WASD'], ['Attack', 'J / Click'], ['Dodge', 'Space'], ['Cast', 'L / Right click'], ['Interact', 'E'], ['Spells', 'Q R 1-4'], ['Book', 'I B T M N']].forEach((r, i) => { Font.draw(g, r[0], 90, 78 + i * 16, C.ink); Font.draw(g, r[1], 390, 78 + i * 16, C.gold, { align: 'right' }); }); return; }
+      if (this.sub === 'ctl') { UI.panel(g, 70, 60, 340, 150, { title: 'Controls' }); [['Move', 'WASD'], ['Attack', 'J / Click'], ['Dodge', 'Space'], ['Cast', 'L / Right click'], ['Interact', 'E'], ['Spells', 'Q R 1-8'], ['Book', 'I B T M N G']].forEach((r, i) => { Font.draw(g, r[0], 90, 78 + i * 16, C.ink); Font.draw(g, r[1], 390, 78 + i * 16, C.gold, { align: 'right' }); }); return; }
       if (this.sub) { SC.saves.draw(g, Gm, time, this.sub); return; }
       UI.panel(g, 170, 60, 140, 150, { title: 'Paused' }); UI.menu(g, this.items, this.sel, 180, 80, 120, time, { lh: 16, align: 'center' }); Font.draw(g, 'Day ' + Gm.day + '  Level ' + Gm.level, 240, 196, C.dim, { align: 'center' });
     },
