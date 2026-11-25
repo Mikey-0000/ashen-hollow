@@ -55,7 +55,7 @@
 
   /* gothic pointer: an aiming sigil in play, a small barbed arrow in menus. Only while the mouse is the active device. */
   function drawCursor() {
-    if (!Input.mouseActive()) return;
+    if (!Input.mouseActive() || G.screen === 'photo') return;
     const m = Input.mouse, x = Math.round(m.x), y = Math.round(m.y), t = performance.now() / 1000, play = G.mode === 'play' && !G.screen;
     if (x < 0 || y < 0 || x >= W || y >= H) return;
     g.save();
@@ -78,7 +78,7 @@
     else if (G.mode === 'charsel') SC.charsel.draw(g, G, time);
     else if (G.mode === 'epilogue') SC.epilogue.draw(g, G, time);
     else if (G.mode === 'play' && G.world) {
-      G.world.draw(g); if (AH.VFX) AH.VFX.post(g); AH.UI.hud(g, G, time);
+      G.world.draw(g); if (AH.VFX) AH.VFX.post(g); if (G.screen !== 'photo') AH.UI.hud(g, G, time);
       if (G.bossIntroT > 0 && G.world.boss) { const a = U.clamp(Math.min(G.bossIntroT, 3 - G.bossIntroT) * 2, 0, 1); g.globalAlpha = a; const big = AH.Font.big(G.world.boss.name.toUpperCase(), 3, '#f6e2a8', '#a87a30', '#1a0e04'); g.drawImage(big, Math.round(W / 2 - big.width / 2), 62); g.globalAlpha = 1; }
       if (G.screen && SC[G.screen]) SC[G.screen].draw(g, G, time);
     }

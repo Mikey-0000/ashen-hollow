@@ -7,7 +7,7 @@
     attack: ['KeyJ', 'KeyZ'], dodge: ['Space', 'KeyK', 'KeyX'], cast: ['KeyL', 'KeyC'], interact: ['KeyE', 'KeyF'],
     prev: ['KeyQ'], next: ['KeyR'], sight: ['KeyV'],
     slot1: ['Digit1'], slot2: ['Digit2'], slot3: ['Digit3'], slot4: ['Digit4'], slot5: ['Digit5'], slot6: ['Digit6'], slot7: ['Digit7'], slot8: ['Digit8'],
-    inventory: ['KeyI'], spells: ['KeyB'], skills: ['KeyT'], map: ['KeyM'], codex: ['KeyN'], journal: ['KeyG'], pause: ['Escape', 'KeyP'],
+    inventory: ['KeyI'], spells: ['KeyB'], skills: ['KeyT'], map: ['KeyM'], codex: ['KeyN'], journal: ['KeyG'], photo: ['F8'], pause: ['Escape', 'KeyP'],
     confirm: ['Enter', 'Space', 'KeyE', 'KeyJ', 'KeyZ'], back: ['Escape', 'Backspace', 'KeyX', 'KeyK'],
     tabL: ['KeyQ', 'PageUp'], tabR: ['KeyR', 'PageDown', 'Tab'],
   };

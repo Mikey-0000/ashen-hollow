@@ -36,7 +36,7 @@
       }
       Font.draw(g, String(i + 1), sx + 2, sy + 12, on ? C.gold : C.dim, { outline: '#05040a', shadow: false });
     }
-    const cur = G.slots[G.sel] && AH.getSpell(G.slots[G.sel]); if (cur) { const c = p.costOf(cur); const cs = Object.keys(c).map((k) => (k === 'reagent' ? AH.Items[c[k]].name.split(' ')[0] : c[k] + ' ' + k)).join(' ') ; Font.draw(g, cur.name, 8, sy - 10 - (rows2 ? 24 : 0), AH.Schools[cur.school].col, { outline: '#05040a' }); Font.draw(g, cs, 8 + Font.width(cur.name) + 6, sy - 10 - (rows2 ? 24 : 0), C.dim, { outline: '#05040a' }); }
+    const cur = G.slots[G.sel] && AH.getSpell(G.slots[G.sel]); if (cur) { const c = p.costOf(cur); const cs = G.settings.unlimitedMagic ? 'free' : Object.keys(c).map((k) => (k === 'reagent' ? AH.Items[c[k]].name.split(' ')[0] : c[k] + ' ' + k)).join(' ') ; Font.draw(g, cur.name, 8, sy - 10 - (rows2 ? 24 : 0), AH.Schools[cur.school].col, { outline: '#05040a' }); Font.draw(g, cs, 8 + Font.width(cur.name) + 6, sy - 10 - (rows2 ? 24 : 0), C.dim, { outline: '#05040a' }); }
     /* --- clock & weather, top-right --- */
     const hr = G.hour, hh = Math.floor(hr), mm = Math.floor((hr - hh) * 60), day = AH.Lighting.daylight(hr), cx = W - 22, cy = 20;
     g.fillStyle = '#05040a'; g.fillRect(cx - 14, cy - 14, 28, 28); g.fillStyle = C.iron; g.fillRect(cx - 13, cy - 13, 26, 26); g.fillStyle = '#0e0c16'; g.fillRect(cx - 12, cy - 12, 24, 24);
