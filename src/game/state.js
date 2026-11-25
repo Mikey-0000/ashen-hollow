@@ -4,7 +4,7 @@
   'use strict';
   const AH = window.AH, U = AH.U;
   const SAVE_KEY = 'ashen_hollow_v1_slot', SET_KEY = 'ashen_hollow_v1_settings';
-  const DEFAULT_SETTINGS = { master: 0.7, music: 0.55, sfx: 0.8, shake: 1, hitstop: 1, particles: 1, reduceFlash: false, scale: 'fit', display: 'smooth', unlimitedSP: true, resolution: 'auto', fullHud: true, showHints: true };
+  const DEFAULT_SETTINGS = { master: 0.7, music: 0.55, sfx: 0.8, shake: 1, hitstop: 1, particles: 1, reduceFlash: false, scale: 'fit', display: 'smooth', unlimitedSP: true, unlimitedMagic: true, resolution: 'auto', fullHud: true, showHints: true };
 
   const G = (AH.G = {
     settings: Object.assign({}, DEFAULT_SETTINGS), flags: {}, inv: {}, equip: { weapon: 'sickle_rust', cloak: 'mantle_pilgrim', relic1: null, relic2: null }, spells: [], slots: [null, null, null, null], sel: 0,
