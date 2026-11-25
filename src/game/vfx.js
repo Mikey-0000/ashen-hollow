@@ -5,7 +5,8 @@
 (function () {
   'use strict';
   const AH = window.AH, U = AH.U, P = AH.Particles, Co = AH.Combat;
-  const V = (AH.VFX = { flash: 0, flashCol: '#ffffff', aber: 0, speed: 0, vig: 0, vigCol: '#ffffff', _st: '', _perfect: 0, _x: 0, _y: 0, _step: 0, _ff: 0, _lf: 0, _dm: 0, _trail: 0 });
+  const Gm_level = () => (AH.G && AH.G.level) || 0;
+  const V = (AH.VFX = { _rn: 0, _fl: 0, _lvl: 0, _ember: 0, flash: 0, flashCol: '#ffffff', aber: 0, speed: 0, vig: 0, vigCol: '#ffffff', _st: '', _perfect: 0, _x: 0, _y: 0, _step: 0, _ff: 0, _lf: 0, _dm: 0, _trail: 0 });
   const G = () => AH.G, calm = () => !!G().settings.reduceFlash, WR = () => G().world;
   const SCH = {
     necro: ['#7fe0c0', '#d4fff0', '#2a8a70'], druid: ['#8fd06a', '#e0ffb8', '#4a8a30'], blood: ['#d04050', '#ff9aa0', '#7a1420'],
@@ -163,6 +164,53 @@
     if (w.def && w.def.canopy > 0.3) { V._lf += dt; if (V._lf > 0.45) { V._lf = 0; P.emit({ x: cam.x + U.rr(-20, Wd + 20), y: cam.y + U.rr(10, Hd - 30), z: U.rr(26, 60), vx: 8 + We.wind * 22, vy: U.rr(2, 10), vz: -U.rr(8, 18), life: U.rr(3, 6), size: 2, size2: 1, c: U.pick(['#7a5a30', '#9a7a3a', '#5a6a2a']), wob: 22, ground: 1 }); } }
   };
 
+
+  /* ------------------------------------------------------------------ weather, level-up, bosses */
+  V.weather = (dt, w) => {
+    const We = AH.Weather, cam = w.cam, Wd = AH.W, Hd = AH.H; if (We.indoor) return;
+    /* rain: splash rings and a spit of droplets where the drops land */
+    if (We.rainK > 0.3) { V._rn += dt * 38 * We.rainK; while (V._rn >= 1) { V._rn -= 1; const x = cam.x + U.rr(0, Wd), y = cam.y + U.rr(30, Hd);
+      P.emit({ x, y, ring: true, size: 1, size2: U.rr(3, 6), life: 0.32, c: '#a8c4dc', add: true, sy: 0.5 });
+      if (Math.random() < 0.5) P.emit({ x, y, vz: U.rr(22, 40), g: 220, life: 0.3, size: 1, c: '#d8e8f8', add: true, vx: U.rr(-8, 8), ground: 1 }); } }
+    /* storm: wind-streaks and the lightning itself */
+    if (We.stormK > 0.4 && Math.random() < dt * 14 * We.stormK) P.emit({ x: cam.x - 12, y: cam.y + U.rr(0, Hd), z: U.rr(0, 30), vx: 240 + U.rr(0, 120), vy: U.rr(10, 40), life: 0.9, size: 1, c: '#aebcd4', add: true, streak: 0.09, fade: 1 });
+    if (We.flash > 0.95 && V._fl <= 0.95 && !calm()) V.lightning(w);
+    V._fl = We.flash;
+  };
+  V.lightning = (w) => {
+    const cam = w.cam, x = cam.x + U.rr(60, AH.W - 60), y = cam.y + U.rr(90, AH.H - 40);
+    w.spawnFx({ k: 'bolt', x, y, t: 0, max: 0.3, col: '#eef4ff', seed: Math.random() * 1000 });
+    V.ring(x, y, 34, '#cfe0ff', 0.45, { thick: 2 }); V.pop(x, y - 4, '#cfe0ff', 20, 0.3);
+    P.burst(x, y - 4, 22, { min: 40, max: 170, vz: [20, 90], g: 160, life: [0.2, 0.5], size: 1, c: ['#ffffff', '#bcd0ff'], add: true, streak: 0.04 });
+    V.flash = Math.max(V.flash, 0.4); V.flashCol = '#cfe0ff';
+  };
+  V.levelUp = (p) => {
+    const c = ['#ffd070', '#fff4c8', '#c88a20'];
+    V.rune(p.x, p.y + 2, 40, c, 1.4, 6); V.pillar(p.x, p.y, c[0], 130, 1.1, 12);
+    V.ring(p.x, p.y, 70, c[0], 0.9, { thick: 3 }); V.ring(p.x, p.y, 42, c[1], 0.6, { thick: 2 });
+    for (let i = 0; i < 36; i++) { const a = (i / 36) * 6.283; P.emit({ x: p.x + Math.cos(a) * 22, y: p.y + Math.sin(a) * 12, z: 0, vx: Math.cos(a) * 12, vy: Math.sin(a) * 7, vz: U.rr(40, 120), g: -14, life: U.rr(0.8, 1.6), size: 2, size2: 0, c: i % 3 ? c[0] : c[1], add: true, streak: 0.03, wob: 6 }); }
+    if (!calm()) { V.flash = Math.max(V.flash, 0.45); V.flashCol = '#fff0c0'; V.vig = 0.8; V.vigCol = c[0]; }
+  };
+  V.bossPhase = (b) => {
+    const c = ['#ff5a6a', '#ffd0d0', '#8a1828'], x = b.x, y = b.y;
+    [0, 0.12, 0.26].forEach((d, i) => { const w = WR(); if (!w) return; add(w, { x, y, max: d + 0.01, upd(f) { if (!f.done && f.t >= d) { f.done = true; V.ring(x, y, 60 + i * 55, c[i === 2 ? 1 : 0], 0.7 + i * 0.1, { thick: 3 - i * 0.5 }); } }, draw() {} }); });
+    V.pillar(x, y, c[0], 150, 0.9, 16); V.pop(x, y - 14, c[1], 36, 0.4);
+    P.burst(x, y - 12, 60, { min: 40, max: 260, vz: [10, 120], g: 90, life: [0.4, 1.1], size: 1, c: [c[0], c[1], '#ffd890'], add: true, streak: 0.05, drag: 0.8 });
+    if (!calm()) { V.flash = 0.75; V.flashCol = '#ffe0e0'; V.aber = 1; V.vig = 0.9; V.vigCol = c[0]; V.speed = 0.6; }
+  };
+  /* the hero's lantern: a warm bloom with a flickering flare, brighter the darker it gets */
+  function lanternGlow(g, time) {
+    const Gm = G(), p = Gm.player, w = Gm.world; if (!p || p.dead || Gm.screen) return;
+    const cam = w.cam, dir = p.face === undefined ? 0 : p.face, lx = dir === 2 ? -7 : dir === 3 ? 7 : 6, x = Math.round(p.x - cam.x + lx), y = Math.round(p.y - cam.y - 9);
+    const dim = Gm.isDim() || AH.Weather.indoor ? 1 : 0.35, fl = 0.8 + Math.sin(time * 13) * 0.08 + Math.sin(time * 7.3) * 0.08, a = dim * fl * (p.lanternK || 1);
+    g.save(); g.globalCompositeOperation = 'lighter';
+    const gr = g.createRadialGradient(x, y, 0, x, y, 28); gr.addColorStop(0, 'rgba(255,190,90,0.5)'); gr.addColorStop(0.4, 'rgba(255,140,50,0.16)'); gr.addColorStop(1, 'rgba(255,120,40,0)');
+    g.globalAlpha = a; g.fillStyle = gr; g.fillRect(x - 28, y - 28, 56, 56);
+    g.globalAlpha = a * 0.9; g.fillStyle = '#ffe8b0'; const L = 3 + Math.round(fl * 3);
+    for (let i = 1; i <= L; i++) { g.fillRect(x - i, y, 1, 1); g.fillRect(x + i, y, 1, 1); if (i < L - 1) { g.fillRect(x, y - i, 1, 1); g.fillRect(x, y + i, 1, 1); } }
+    g.restore();
+  }
+
   /* ------------------------------------------------------------------ per-frame */
   V.update = (dt) => {
     const w = WR(), p = G().player; if (!w || !p || G().mode !== 'play') return;
@@ -175,7 +223,9 @@
       if (p.perfect > V._perfect + 0.5) V.onPerfect(p); V._perfect = p.perfect || 0;
       const mv = Math.hypot(p.x - V._x, p.y - V._y); V._x = p.x; V._y = p.y;
       if (mv > 0 && mv < 12 && st !== 'dodge' && st !== 'dash') { V._step += mv; if (V._step > 11) { V._step = 0; V.step(p, w); } }
-      V.ambient(dt, w);
+      V.ambient(dt, w); V.weather(dt, w);
+      if (V._lvl && Gm_level() > V._lvl) V.levelUp(p); V._lvl = Gm_level();
+      V._ember -= dt; if (V._ember <= 0 && !G().screen) { V._ember = U.rr(0.25, 0.6); const dir = p.face || 0; P.emit({ x: p.x + (dir === 2 ? -7 : dir === 3 ? 7 : 6), y: p.y, z: 8, vx: U.rr(-5, 5), vy: U.rr(-3, 3), vz: U.rr(8, 22), g: -4, life: U.rr(0.6, 1.2), size: 1, c: '#ffc070', add: true, wob: 5 }); }
     });
   };
 
@@ -215,6 +265,7 @@
       godRays(g, time);
       if (!c && V.aber > 0.04) aberrate(g);
       if (!c && V.speed > 0.04) speedLines(g);
+      lanternGlow(g, time);
       if (V.vig > 0.02) { const gr = g.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, W * 0.62); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, V.vigCol); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(0.55, V.vig * (c ? 0.35 : 0.6)); g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore(); }
       if (!c && V.flash > 0.02) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(0.5, V.flash * 0.6); g.fillStyle = V.flashCol; g.fillRect(0, 0, W, H); g.restore(); }
     });
@@ -232,6 +283,7 @@
   };
   const dieOrig = AH.Enemy.prototype.die;
   AH.Enemy.prototype.die = function (o) { const was = this.dead; const r = dieOrig.apply(this, arguments); if (!was && this.dead) safe(() => V.onDeath(this, o)); return r; };
+  if (AH.Boss && AH.Boss.prototype.phaseShift) { const po = AH.Boss.prototype.phaseShift; AH.Boss.prototype.phaseShift = function () { const r = po.apply(this, arguments); safe(() => V.bossPhase(this)); return r; }; }
   const Wc = AH.World && AH.World.prototype;
   if (Wc && Wc.slash) { const so = Wc.slash; Wc.slash = function (x, y, ang, reach, arc, col, life) { so.apply(this, arguments); safe(() => V.slashFx(this, x, y, ang, reach, arc, col)); }; }
 })();
