@@ -75,6 +75,7 @@
     o = o || {}; const lh = o.lh || 14;
     items.forEach((it, i) => {
       const yy = y + i * lh, on = i === sel, dis = it.disabled;
+      UI.hotr('n' + items.length, i, x - 2, yy - 2, w + 4, lh - 2);
       if (on) UI.select(g, x - 2, yy - 2, w + 4, lh - 2, time);
       AH.Font.draw(g, it.label, o.align === 'center' ? x + w / 2 : x + 6, yy + 1, dis ? '#5a5448' : on ? '#fff0c0' : C.ink, { align: o.align, outline: on ? '#2a1a08' : null });
       if (it.value !== undefined) AH.Font.draw(g, String(it.value), x + w - 4, yy + 1, on ? C.gold : C.dim, { align: 'right' });

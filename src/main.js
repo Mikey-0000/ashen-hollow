@@ -72,7 +72,7 @@
     }
     g.restore();
   }
-  function draw() {
+  function draw() { if (AH.UI.hotBegin) AH.UI.hotBegin();
     g.fillStyle = '#000'; g.fillRect(0, 0, W, H); const time = performance.now() / 1000;
     if (G.mode === 'title') { SC.title.draw(g, G, time); if (G.screen === 'settings') SC.settings.draw(g, G, time); }
     else if (G.mode === 'charsel') SC.charsel.draw(g, G, time);
