@@ -3,11 +3,11 @@
   'use strict';
   const AH = window.AH, U = AH.U, Art = AH.Art, rgb = U.hex;
   const CW = 76, CH = 48;
-  function raster(CW, CH) {
+  function raster(CW, CH, oy) {
     const d = new Uint8ClampedArray(CW * CH * 4);
     const R = {
       d, CW, CH,
-      set(x, y, c) { x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= CW || y >= CH) return; const a = typeof c === 'string' ? rgb(c) : c, i = (y * CW + x) * 4; d[i] = a[0]; d[i + 1] = a[1]; d[i + 2] = a[2]; d[i + 3] = 255; },
+      set(x, y, c) { x = Math.round(x); y = Math.round(y) + (oy || 0); if (x < 0 || y < 0 || x >= CW || y >= CH) return; const a = typeof c === 'string' ? rgb(c) : c, i = (y * CW + x) * 4; d[i] = a[0]; d[i + 1] = a[1]; d[i + 2] = a[2]; d[i + 3] = 255; },
       ell(cx, cy, rx, ry, t, rot) {
         const co = Math.cos(rot || 0), si = Math.sin(rot || 0);
         for (let y = Math.floor(cy - rx - ry); y <= Math.ceil(cy + rx + ry); y++) for (let x = Math.floor(cx - rx - ry); x <= Math.ceil(cx + rx + ry); x++) {
@@ -94,4 +94,28 @@
     return { c, w: BW / 2, h: BH / 2, ax: 28, ay: 66, hi: true, _sil: {}, _flip: null };
   }
   Art.boss = { idle: [choir('idle'), choir('idle2')], raise: choir('raise'), slam: choir('slam'), kneel: choir('kneel') };
+  /* ---- Thorn stag (optional guardian) ---- */
+  const SW = 112, SH = 108, SC_ = ['#9a8860', '#6a5a40', '#3a2e20'], AN = ['#ece0c0', '#b0a280', '#6a604a'];
+  function stag(pose) {
+    const R = raster(SW, SH, 20), w = pose === 'walk1' ? 5 : pose === 'walk2' ? -5 : 0, paw = pose === 'paw', h = U.hash;
+    const leg = (x, sw, far) => { const t = far ? [SC_[1], SC_[2], SC_[2]] : SC_; R.limb(x, 48, x + sw * 0.5, 66, 6, t); R.limb(x + sw * 0.5, 66, x + sw + (far ? 0 : 0), 82, 4, t); R.ell(x + sw + 1, 83, 3.4, 2.2, ['#5a4a38', '#2e2418', '#1a140c']); };
+    leg(34, -w, true); leg(78, w, true);
+    R.limb(46, 42, 40, 36, 4, SC_);
+    for (let i = 0; i < 9; i++) { const x = 34 + i * 5; R.limb(x, 38, x - 1, 28 - (i % 2) * 3, 3, ['#4a6a3a', '#2e4a26', '#1a2e16']); }   // thorn ridge
+    R.ell(52, 44, 26, 13, SC_); R.ell(36, 46, 12, 12, SC_); R.ell(74, 42, 13, 13, SC_);
+    for (let i = 0; i < 40; i++) { const x = 30 + Math.floor(h(i, 3, 71) * 50), y = 34 + Math.floor(h(i, 4, 71) * 22); if (R.d[((y + 20) * SW + x) * 4 + 3]) { R.set(x, y, '#5a7a44'); R.set(x + 1, y, '#46623a'); } }   // moss
+    leg(40, w, false); leg(84, -w, false);
+    const hx = 92, hy = paw ? 32 : 24;
+    R.limb(78, 36, hx - 4, hy + 4, 12, SC_);
+    R.ell(hx, hy, 9, 7.5, SC_); R.ell(hx + 9, hy + 3, 8, 4.4, SC_); R.set(hx + 16, hy + 3, '#14100a'); R.set(hx + 15, hy + 3, '#14100a');
+    R.ell(hx - 1, hy - 2, 2.6, 2.6, ['#c8ffb0', '#6ad060', '#2e7a2a']); R.set(hx - 2, hy - 3, '#ffffff');
+    R.limb(hx - 6, hy - 6, hx - 11, hy - 13, 4, SC_);   // ear
+    /* antlers: a bare winter tree */
+    const ant = (x0, y0, ang, len, wd, d) => { const x1 = x0 + Math.cos(ang) * len, y1 = y0 + Math.sin(ang) * len; R.limb(x0, y0, x1, y1, wd, AN); if (d > 0) { ant(x1, y1, ang - 0.55, len * 0.72, Math.max(2, wd - 1), d - 1); ant(x1, y1, ang + 0.4, len * 0.7, Math.max(2, wd - 1), d - 1); if (d > 1) R.set(x1, y1, '#9affb0'); } };
+    ant(hx - 4, hy - 6, -1.9, 15, 4, 3); ant(hx + 1, hy - 7, -1.2, 14, 3, 3);
+    outline(R, '#120e08');
+    const c = U.makeCanvas(SW, SH), g = c.getContext('2d'); g.putImageData(new ImageData(R.d, SW, SH), 0, 0);
+    return { c, w: SW / 2, h: SH / 2, ax: 24, ay: 52, hi: true, _sil: {}, _flip: null };
+  }
+  Art.stag = { walk: [stag('walk1'), stag('stand'), stag('walk2'), stag('stand')], stand: stag('stand'), paw: stag('paw') };
 })();

@@ -4,7 +4,7 @@
   'use strict';
   const AH = window.AH, U = AH.U;
   const SAVE_KEY = 'ashen_hollow_v1_slot', SET_KEY = 'ashen_hollow_v1_settings';
-  const DEFAULT_SETTINGS = { master: 0.7, music: 0.55, sfx: 0.8, shake: 1, hitstop: 1, particles: 1, reduceFlash: false, scale: 'fit', display: 'smooth', fullHud: true, showHints: true };
+  const DEFAULT_SETTINGS = { master: 0.7, music: 0.55, sfx: 0.8, shake: 1, hitstop: 1, particles: 1, reduceFlash: false, scale: 'fit', display: 'smooth', unlimitedSP: true, fullHud: true, showHints: true };
 
   const G = (AH.G = {
     settings: Object.assign({}, DEFAULT_SETTINGS), flags: {}, inv: {}, equip: { weapon: 'sickle_rust', cloak: 'mantle_pilgrim', relic1: null, relic2: null }, spells: [], slots: [null, null, null, null], sel: 0,
@@ -71,8 +71,8 @@
     const slot = G.slots.indexOf(null); if (slot >= 0) G.slots[slot] = id;
     if (!quiet) { G.toast('Spell: ' + AH.Spells[id].name, AH.Schools[AH.Spells[id].school].col); AH.Audio.sfx('learn'); }
   };
-  G.canBuy = (id) => { const k = AH.Skills[id]; return k && !G.skills[id] && G.skillPoints >= k.cost && k.req.every((r) => G.skills[r]); };
-  G.buySkill = (id) => { if (!G.canBuy(id)) return false; const k = AH.Skills[id]; G.skillPoints -= k.cost; G.skills[id] = 1; if (k.unlock) G.unlockSpell(k.unlock); G.player.recalc(); AH.Audio.sfx('learn'); return true; };
+  G.canBuy = (id) => { const k = AH.Skills[id]; return k && !G.skills[id] && (G.settings.unlimitedSP || G.skillPoints >= k.cost) && k.req.every((r) => G.skills[r]); };
+  G.buySkill = (id) => { if (!G.canBuy(id)) return false; const k = AH.Skills[id]; if (!G.settings.unlimitedSP) G.skillPoints -= k.cost; G.skills[id] = 1; if (k.unlock) G.unlockSpell(k.unlock); G.player.recalc(); AH.Audio.sfx('learn'); return true; };
   G.addCorruption = (n, cleanse) => {
     const p = G.player; if (n > 0) n *= Math.max(0.2, 1 + p.mod('corruptGain')); const was = p.corruption; p.corruption = U.clamp(p.corruption + n, 0, 100);
     if (n > 0 && p.corruption >= 25 && was < 25) G.toast('The taint takes hold.', '#9a5aba'); if (p.corruption >= 50 && was < 50) G.toast('Your shadow lags behind you.', '#b04aba'); if (p.corruption >= 75 && was < 75) G.toast('Something answers when you cast.', '#d0407a');
