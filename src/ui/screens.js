@@ -229,7 +229,7 @@
     },
     draw(g, Gm, time) {
       g.fillStyle = 'rgba(5,4,10,0.7)'; g.fillRect(0, 0, W, H);
-      if (this.sub === 'ctl') { UI.panel(g, 70, 60, 340, 150, { title: 'Controls' }); [['Move', 'WASD'], ['Attack', 'J / Click'], ['Dodge', 'Space'], ['Cast', 'L / Right click'], ['Interact', 'E'], ['Spells', 'Q R 1-8'], ['Book', 'I B T M N G']].forEach((r, i) => { Font.draw(g, r[0], 90, 78 + i * 16, C.ink); Font.draw(g, r[1], 390, 78 + i * 16, C.gold, { align: 'right' }); }); return; }
+      if (this.sub === 'ctl') { UI.panel(g, 70, 60, 340, 150, { title: 'Controls' }); [['Move', 'WASD'], ['Attack', 'J / Click'], ['Dodge', 'Space'], ['Cast', 'L / Right click'], ['Interact', 'E'], ['Spells', 'Q R 1-8'], ['Book', 'I B T M N G'], ['Unstick', 'U']].forEach((r, i) => { Font.draw(g, r[0], 90, 78 + i * 16, C.ink); Font.draw(g, r[1], 390, 78 + i * 16, C.gold, { align: 'right' }); }); return; }
       if (this.sub) { SC.saves.draw(g, Gm, time, this.sub); return; }
       UI.panel(g, 170, 60, 140, 150, { title: 'Paused' }); UI.menu(g, this.items, this.sel, 180, 80, 120, time, { lh: 16, align: 'center' }); Font.draw(g, 'Day ' + Gm.day + '  Level ' + Gm.level, 240, 196, C.dim, { align: 'center' });
     },
