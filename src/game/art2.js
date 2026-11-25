@@ -16,10 +16,10 @@
       has(x, y) { x = Math.round(x); y = Math.round(y + OY); return x >= 0 && y >= 0 && x < CW && y < CH && d[(y * CW + x) * 4 + 3] > 0; },
       clear(x, y) { x = Math.round(x); y = Math.round(y + OY); if (x < 0 || y < 0 || x >= CW || y >= CH) return; d[(y * CW + x) * 4 + 3] = 0; },
       /* shaded ellipse; light from top-left. keep(x,y) optional filter */
-      ell(cx, cy, rx, ry, t, keep) {
+      ell(cx, cy, rx, ry, t, keep, soft) {
         for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
           const nx = (x - cx) / rx, ny = (y - cy) / ry; if (nx * nx + ny * ny > 1) continue; if (keep && !keep(x, y)) continue;
-          const l = -nx * 0.6 - ny * 0.8; R.set(x, y, l > 0.42 ? t[0] : l < -0.22 ? t[2] : t[1]);
+          const l = -nx * 0.6 - ny * 0.8; R.set(x, y, soft ? (l > 0.85 ? t[0] : l < -0.9 ? t[2] : t[1]) : (l > 0.42 ? t[0] : l < -0.22 ? t[2] : t[1]));
         }
       },
       /* shaded block: light top/left, shadow right/bottom */
@@ -44,11 +44,11 @@
   function figure(s, dir, f) {
     const R = paint(), set = R.set, ell = R.ell, rect = R.rect;
     const body = s.cloth, skin = s.skin, hair = s.hair || s.hood || ['#6a6a72', '#44444c', '#2a2a30'], pants = s.pants || body, boots = s.boots || pants;
-    const ink = dk(hair[2], 0.45), iris = s.eyeGlow || s.eyes || '#2a1a1a';
+    const ink = dk(hair[2], 0.45), eyeC = s.eyeGlow || s.eyes || '#2a1a1a', lum = (c) => { const a = rgb(c); return a[0] * 0.3 + a[1] * 0.59 + a[2] * 0.11; }, iris = lum(eyeC) < 70 ? (lum(hair[1]) > 150 ? '#4a8ad8' : lum(hair[1]) > 90 ? '#3a9a6a' : '#5a7ad0') : eyeC;
     const hemY = s.len === 'long' ? 62 : s.len === 'coat' ? 54 : s.len === 'short' ? 49 : 0;
     const wide = (s.wide | 0) + (s.broad | 0) * 2, step = f === 1 ? 1 : f === 2 ? -1 : 0, bob = f ? -1 : 0;
     const front = dir === 0, back = dir === 1, side = dir === 2;
-    const cx = side ? 19 : CX - 0, torsoHW = (side ? 6 : 8) + wide;
+    const cx = side ? 19 : CX - 0, torsoHW = (side ? 5 : 6) + Math.ceil(wide / 2);
     const top = 28 + bob, waist = 46 + bob, floatF = !!s.float;
     const taller = (s.stretch | 0);   // taller people get a longer torso
     const legTop = waist + 1;
@@ -82,6 +82,7 @@
     }
     /* ---- torso ---- */
     if (!hemY) { /* short tunic already covers; keep waist block */ }
+    R.rect(cx - 2, top - 3, cx + 1, top + 2, [skin[1], skin[1], skin[2]], 1);
     R.rect(cx - torsoHW, top + 1, cx + torsoHW - 1, waist, body, 3);
     for (let y = waist - 8; y <= waist; y++) { set(cx - torsoHW + 4, y, body[2]); set(cx + torsoHW - 5, y, body[2]); }
     if (!side) { /* chest cel line + collar V */ for (let y = top + 2; y <= top + 6; y++) set(cx - 1, y, body[2]); }
@@ -96,11 +97,12 @@
     if (s.clasp && front) { rect(cx - 5, top + 10, cx + 4, top + 12, s.cuff || body, 1); }
     /* ---- arms ---- */
     function arm(ax, swing, which) {
-      const y0 = top + 3, len = 14, ay = y0 + swing;
+      const y0 = top + 3, len = 17, ay = y0 + swing;
       const sleeve = s.bell ? 4 : 3;
       rect(ax, y0 + (swing < 0 ? swing : 0), ax + sleeve, y0 + len - 4 + Math.max(0, swing), body, 1);
+      for (let y = y0; y < y0 + len - 4; y++) set(which === 'L' ? ax + sleeve : ax, y + (swing < 0 ? swing : 0) * 0, dk(body[2], 0.8));
       if (s.cuff) { rect(ax - (s.bell ? 1 : 0), y0 + len - 5 + swing, ax + sleeve + (s.bell ? 1 : 0), y0 + len - 3 + swing, s.cuff, 1); }
-      ell(ax + 1.5, y0 + len - 1 + swing, 2.4, 2.4, skin);
+      ell(ax + 1.5, y0 + len - 1 + swing, 2.4, 2.4, skin, null, true);
       if (s.pauldron && which === 'L') ell(ax + 1, y0 - 1, 4.5, 3.3, s.pauldron);
     }
     if (front) { arm(cx - torsoHW - 3, -step * 2, 'L'); arm(cx + torsoHW - 1, step * 2, 'R'); }
@@ -123,7 +125,7 @@
       if (s.style === 'long') R.trap(hx + (side ? -3 : 0), hcy + 4, hcy + hl, 10, 11, hair, 0);
       if (s.style === 'braid') { for (let y = hcy + 6; y < hcy + 26; y++) { const wv = Math.round(Math.sin(y * 0.8) * 1.2), bx = side ? hx - 11 + wv : hx - 12 + wv; ell(bx + 1, y, 2.5, 1.6, hair); } }
     }
-    ell(hx, hcy, hrx, hry, skin);
+    ell(hx, hcy, hrx, hry, skin, null, true);
     if (side) { set(hx + 11, hcy + 2, skin[1]); set(hx + 12, hcy + 3, skin[1]); set(hx + 11, hcy + 3, skin[1]); }   // nose
     if (s.style === 'helm') {
       ell(hx, hcy - 1, 12, 11.8, s.helm, (x, y) => y < hcy + 11);
@@ -148,6 +150,7 @@
           else keep = y < fy(x) || (Math.abs(x - hx) > 9.2 && y < hcy + (s.style === 'long' || s.style === 'braid' ? 10 : 5));
           if (!keep) continue;
           const l = -nx * 0.6 - ny * 0.8, strand = ((x * 2 + y * 3) % 9) === 0 && l > 0.0;
+          if (front && y >= fy(x) - 2 && y < fy(x) && !(Math.abs(x - hx) > 9.2)) { set(x, y, hair[2]); continue; }
           set(x, y, strand || l > 0.5 ? hair[0] : l < -0.2 || (y > hcy + 3 && !front) ? hair[2] : hair[1]);
         }
         if (s.style === 'bun') { ell(hx + (side ? -6 : 0), hcy - 14, 5.5, 4.5, hair); }
@@ -167,7 +170,7 @@
           if (s.eyeGlow) set(ex + 1, hcy + 1 + eh - 1, s.eyeGlow);
         });
         if (!s.mask) { set(hx, hcy + 8, skin[2]); set(hx - 1, hcy + 9, skin[2]); set(hx, hcy + 9, skin[2]); set(hx - 1, hcy + 10, mixc(skin[2], '#7a2a30', 0.5)); set(hx, hcy + 10, mixc(skin[2], '#7a2a30', 0.5)); }
-        if (s.beard) { for (let y = hcy + 6; y <= hcy + 13; y++) for (let x = hx - 8; x <= hx + 8; x++) { if (R.has(x, y) && (y > hcy + 9 || Math.abs(x - hx) > 6)) set(x, y, y > hcy + 11 ? hair[2] : hair[1]); } }
+        if (s.beard) { for (let y = hcy + 6; y <= hcy + 14; y++) for (let x = hx - 9; x <= hx + 9; x++) { if (!R.has(x, y)) continue; const jaw = y > hcy + 9, stache = y >= hcy + 8 && y <= hcy + 9 && Math.abs(x - hx) < 5 && Math.abs(x - hx) > 0, sideb = Math.abs(x - hx) > 7 && y > hcy + 5; if (jaw || stache || sideb) set(x, y, y > hcy + 12 ? hair[2] : hair[1]); } }
       } else if (side) {
         const ex = hx + 6; for (let y = 0; y < (s.bigEyes ? 6 : 5); y++) for (let x = 0; x < 3; x++) set(ex + x, hcy + 1 + y, y === 0 ? ink : iris);
         set(ex + 2, hcy + 2, '#fff8f0'); set(hx + 7, hcy + 9, mixc(skin[2], '#7a2a30', 0.5)); set(hx + 8, hcy + 9, mixc(skin[2], '#7a2a30', 0.5));
@@ -187,6 +190,7 @@
     if (s.tatter) { for (let x = 0; x < CW; x++) { const cut = (x * 5 + dir) % 4; for (let y = hemY - 1 + (0); y > hemY - 1 - cut; y--) R.clear(x, y + bob); } }
     return R;
   }
+  function mixHex(a, b, k) { const m = mixc(a, b, k); return '#' + m.map((v) => Math.round(v).toString(16).padStart(2, '0')).join(''); }
   function mixc(a, b, k) { const A = typeof a === 'string' ? rgb(a) : a, B = typeof b === 'string' ? rgb(b) : b; return [A[0] + (B[0] - A[0]) * k, A[1] + (B[1] - A[1]) * k, A[2] + (B[2] - A[2]) * k]; }
 
   /* coloured outline: a dark shade of the neighbouring fill colour */
