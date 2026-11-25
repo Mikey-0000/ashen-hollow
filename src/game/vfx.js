@@ -232,7 +232,7 @@
   /* ------------------------------------------------------------------ post pass */
   let cp = null, tc = null, cpg = null, tg = null;
   function aberrate(g) {
-    if (!cp) { const K = AH.SC || 1; cp = U.makeCanvas(AH.W * K, AH.H * K); tc = U.makeCanvas(AH.W * K, AH.H * K); cpg = cp.getContext('2d'); tg = tc.getContext('2d'); }
+    if (!cp || cp.width !== AH.W * (AH.SC || 1)) { const K = AH.SC || 1; cp = U.makeCanvas(AH.W * K, AH.H * K); tc = U.makeCanvas(AH.W * K, AH.H * K); cpg = cp.getContext('2d'); tg = tc.getContext('2d'); }
     cpg.globalCompositeOperation = 'copy'; cpg.drawImage(g.canvas, 0, 0);
     const k = Math.max(1, Math.round(V.aber * 3)); g.save(); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.fillStyle = '#000'; g.fillRect(0, 0, AH.W, AH.H);
     [['#ff0000', -k, 0], ['#00ff00', 0, 0], ['#0000ff', k, 0]].forEach((c) => {

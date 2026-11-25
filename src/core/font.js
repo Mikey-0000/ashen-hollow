@@ -95,7 +95,7 @@
     for (let i = 0; i < text.length; i++) {
       const gl = glyphs[text[i]] || glyphs['?'];
       if (gl.space) { x += 3; continue; }
-      g.drawImage(a, gl.sx, 0, gl.w, CELL_H, x, y, gl.w, CELL_H);
+      if (AH.Hi && AH.Hi.on) g.drawImage(AH.Hi.of(a), gl.sx * 2, 0, gl.w * 2, CELL_H * 2, x, y, gl.w, CELL_H); else g.drawImage(a, gl.sx, 0, gl.w, CELL_H, x, y, gl.w, CELL_H);
       x += gl.w + 1;
     }
   }

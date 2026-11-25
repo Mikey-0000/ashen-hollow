@@ -86,7 +86,7 @@
     AH.Present.render(buf);
   }
   function frame(now) {
-    const real = Math.min(0.1, (now - last) / 1000); last = now; acc += real; let n = 0;
+    const real = Math.min(0.1, (now - last) / 1000); last = now; AH.perfWatch && AH.perfWatch(real); acc += real; let n = 0;
     while (acc >= 1 / 60 && n++ < 5) { try { update(1 / 60, 1 / 60); } catch (e) { reportError(e); } acc -= 1 / 60; }
     if (n >= 5) acc = 0;
     try { draw(); } catch (e) { reportError(e); }
@@ -97,5 +97,12 @@
   window.addEventListener('error', (e) => { if (errs.length < 20) errs.push(String(e.message) + ' @' + e.filename + ':' + e.lineno); });
   AH.step = function (n) { for (let i = 0; i < n; i++) update(1 / 60, 1 / 60); draw(); };
   AH.drawNow = draw;
+  /* resolution: 2 = native double-resolution art (default), 1 = classic buffer for slower machines */
+  AH.setRes = function (k) { if (k === AH.SC) return; AH.SC = k; buf.width = W * k; buf.height = H * k; g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false; if (AH.Hi) AH.Hi.on = k > 1; };
+  let slow = 0, nFrames = 0;
+  AH.perfWatch = function (realDt) {
+    const s = G.settings.resolution || 'auto'; if (s === 'high') AH.setRes(2); else if (s === 'standard') AH.setRes(1);
+    else if (G.mode === 'play' && !G.screen && AH.SC === 2) { nFrames++; if (realDt > 0.024) slow++; if (nFrames >= 180) { if (slow > 120) { AH.setRes(1); G.toast('Switched to standard resolution for speed (Settings: Resolution).', '#c8b890'); } nFrames = 0; slow = 0; } }
+  };
   requestAnimationFrame(frame);
 })();
