@@ -23,6 +23,14 @@
       routine: [{ h0: 7, h1: 18, at: [27, 22], act: 'play' }, { h0: 18, h1: 7, at: [9, 29], act: 'sleep' }], rain: { at: [9, 29], act: 'sleep' },
       barks: ['...', 'Do you hear it?', 'Shh.', 'One, two, three, four...'],
       entry: () => (!F('met_wren') ? 'wren_1' : F('choir_end') ? 'wren_after' : 'wren_hub') },
+    corwin: { name: 'Corwin the Hunter', art: 'corwin', speed: 30, col: '#b8c890', area: 'hamlet', home: [20, 24],
+      routine: [{ h0: 5, h1: 11, at: [20, 24], act: 'watch' }, { h0: 11, h1: 18, at: [30, 28], act: 'mend' }, { h0: 18, h1: 5, at: [24, 28], act: 'fire' }], rain: { at: [24, 28], act: 'fire' },
+      barks: ['Tracks, but no beast.', 'The crows know.', 'Don\'t follow a light into the wood.', 'Quiet. Listen.'],
+      entry: () => (!F('met_corwin') ? 'corwin_1' : F('choir_end') ? 'corwin_after' : 'corwin_hub') },
+    ilse: { name: 'Warden Ilse Varr', art: 'ilse', speed: 28, col: '#c8d0e4', area: 'hamlet', home: [32, 24],
+      routine: [{ h0: 6, h1: 12, at: [32, 24], act: 'patrol' }, { h0: 12, h1: 19, at: [34, 28], act: 'patrol' }, { h0: 19, h1: 6, at: [34, 24], act: 'guard' }], rain: { at: [34, 24], act: 'guard' },
+      barks: ['Halt. State your business.', 'Nothing passes the chapel stair.', 'I have seen what comes out at night.', 'Keep that magic to yourself.'],
+      entry: () => (!F('met_ilse') ? 'ilse_1' : F('choir_end') ? 'ilse_after' : 'ilse_hub') },
     vesna: { name: 'Vesna of the Ninth Hearth', art: 'vesna', speed: 24, col: '#c8a8e8', area: 'thornwood', home: [50, 14],
       routine: [{ h0: 6, h1: 21, at: [50, 14], act: 'forage' }, { h0: 21, h1: 6, at: [50, 14], act: 'chant' }], rain: { at: [50, 14], act: 'chant' },
       barks: ['Eight lit, one cold.', 'Hush now, fire.', 'It hears everything.'],
@@ -91,6 +99,29 @@
     { t: 'I can\'t promise that.', next: 'wren_honest', fx: () => { set('cellar_hint'); log('Told Wren you could not promise to return.'); } }]);
   n('wren_promise', 'Wren', 'Pinky promise? ...Okay. Don\'t tell Marta.', [bye('Our secret.')]);
   n('wren_honest', 'Wren', 'Honest is better than nice. Take it anyway. But you\'re not allowed to look sad about it.', [bye()]);
+
+  /* ---- Corwin: the hunter who tracks what the village will not name ---- */
+  n('corwin_1', 'Corwin', 'Easy. I thought you were something else. People don\'t walk the road at this hour unless they\'re lost or hunted. Which are you?', [
+    { t: 'Neither. I came to find out what happened here.', next: 'corwin_hub' }, { t: 'Hunted.', next: 'corwin_hunted' }, bye()], () => set('met_corwin'));
+  n('corwin_hunted', 'Corwin', 'Then keep to firelight. The wood takes the ones who run into it. I\'ve found boots with nothing left in them.', [{ t: 'What lives in the wood?', next: 'corwin_wood' }, bye()]);
+  n('corwin_hub', 'Corwin', 'Ask, then. I\'ve nothing to hide that the crows haven\'t already told someone.', [
+    { t: 'What lives in the wood?', next: 'corwin_wood' }, { t: 'Why do the crows watch us?', next: 'corwin_crows' }, { t: 'The coven in the clearing?', next: 'corwin_coven' }, bye()]);
+  n('corwin_wood', 'Corwin', 'A stag, once. Antlers like a bare winter tree. It never attacked me. It looked, and waited, and I felt weighed. Whatever guards that wood isn\'t a thing you kill and forget.', [{ t: 'Could it be spared?', next: 'corwin_spare' }, bye()], () => set('corwin_stag_hint'));
+  n('corwin_spare', 'Corwin', 'Spared? I\'ve never tried. But it kneeled once, for the old priest. Make of that what you will.', [bye()]);
+  n('corwin_crows', 'Corwin', 'They gather where the dead are still unquiet. Count them at dusk. The number is never the same twice, and I think that is the point.', [bye()]);
+  n('corwin_coven', 'Corwin', 'Eight lit, one cold. That\'s what the old women say. I won\'t go near the fire after dark, and I have never been afraid of fire.', [bye()]);
+  n('corwin_after', 'Corwin', () => ({ free: 'The crows have gone quiet. I haven\'t heard the bell in a day. I don\'t know what to hunt now.', bind: 'The crows follow you now. I\'d be careful what you carry.', silence: 'Nothing is moving. Not the crows, not the wind. I don\'t like it.' }[g().flags.choir_end] || 'It\'s quiet.'), [bye()]);
+  /* ---- Ilse: the warden who sealed the chapel stair ---- */
+  n('ilse_1', 'Ilse', 'Halt. The chapel stair is sealed, and so is my patience. Who sent you?', [
+    { t: 'No one. I\'m looking for answers.', next: 'ilse_hub' }, { t: 'Stand aside.', next: 'ilse_hard' }, bye()], () => set('met_ilse'));
+  n('ilse_hard', 'Ilse', 'You\'ll find I don\'t move. I held this hamlet the night the bell rang. I will hold it again.', [{ t: 'The bell?', next: 'ilse_bell' }, bye()]);
+  n('ilse_hub', 'Ilse', 'Answers cost. Mine cost me a company. Ask carefully.', [
+    { t: 'What happened the night the bell rang?', next: 'ilse_bell' }, { t: 'Why is the stair sealed?', next: 'ilse_stair' }, { t: 'You dislike magic.', next: 'ilse_magic' }, bye()]);
+  n('ilse_bell', 'Ilse', 'It rang once, and nobody was near it. Then the singing started, under the floor. Twelve of my people went down to look. None came up. I closed the door myself.', [bye()], () => set('ilse_bell_known'));
+  n('ilse_stair', 'Ilse', 'It is not sealed against the dead. It is sealed against the living who wish to help them. There is a difference.', [bye()]);
+  n('ilse_magic', 'Ilse', 'I dislike what magic costs, and who pays it. If you carry that burden, carry it well, and not in my sight after dark.', [bye()]);
+  n('ilse_after', 'Ilse', () => ({ free: 'The singing stopped. I should be glad. Why am I not glad?', bind: 'You bound them. I felt it from here. Whatever you\'ve done, do not let it follow you back through my gate.', silence: 'It\'s quiet. I\'ve held my post for twelve nights and I am still listening.' }[g().flags.choir_end] || 'It\'s quiet.'), [bye()]);
+
   n('wren_hub', 'Wren', 'Do you hear the bell? I do. It sounds like it\'s saying my name.', [{ t: 'What does it say?', next: 'wren_bell' }, { t: 'Stay close to Marta.', end: true }, bye()]);
   n('wren_bell', 'Wren', 'Wren. Wren. Wren. Always the same. ...It sounds sad. Like it\'s asking me to come and stop it.', [bye()], () => set('wren_bell_known'));
   n('wren_after', 'Wren', () => ({ free: 'It stopped! And then everybody sang, and it had WORDS this time. Can I come with you now?', bind: 'The crows talk to me now. They say you\'re holding something that isn\'t yours.', silence: 'It\'s too quiet. There\'s something underneath, listening. It knows my name too.' }[g().flags.choir_end] || '...'), [

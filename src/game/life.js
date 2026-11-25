@@ -95,6 +95,8 @@
     w.ambientOverride = null; w.boss = null;
     if (G.flags.procession_done_day === undefined) G.flags.procession_done_day = -1;
     if (areaId === 'hamlet' && G.flags.altar_crypt) { /* stairs already opened */ }
+    /* the bound choir follows you between places */
+    if (G.flags.wraith_allies && G.player) { const p = G.player; for (let i = 0; i < 3; i++) { const an = i * 2.1, e = AH.makeThrall(w, p.x + Math.cos(an) * 24, p.y + Math.sin(an) * 18, 1e9, 7 + G.level * 0.5); e.type = 'wraith'; e.def = Object.assign({}, AH.EnemyDefs.wraith, { ally: true, name: 'Bound Chorister', speed: 58 }); e.hp = e.maxHp = 34; e.lightR = 30; e.lightCol = '#9ab8ff'; e.fade = 0.4; w.allies.push(e); } }
   };
   Ev.onNewDay = function (w) { const G = w.G; G.flags.bloodmoon_now = false; if (G.day % 7 === 0) G.toast('The moon is rising red tonight.', '#c04050'); };
   Ev.update = function (w, dt) {

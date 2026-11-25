@@ -17,7 +17,7 @@
     const P = S.painter(18, 30);
     const px = (x, y, c) => P.px(x, y, c);
     const span = (y, x0, x1, c) => { for (let x = x0; x <= x1; x++) px(x, y, x1 - x0 >= 2 ? (x === x0 ? c[0] : x === x1 ? c[2] : c[1]) : x1 === x0 ? c[1] : x === x0 ? c[0] : c[2]); };
-    const hem = s.len === 'long' ? 26 : s.len === 'coat' ? 24 : s.len === 'short' ? 22 : 0;
+    const b0 = s.broad | 0, hem = s.len === 'long' ? 26 : s.len === 'coat' ? 24 : s.len === 'short' ? 22 : 0;
     const lift1 = f === 1 ? 1 : 0, lift2 = f === 2 ? 1 : 0;
     const sw = f === 1 ? 1 : f === 2 ? -1 : 0;
     const body = s.cloth, skin = s.skin, hair = s.hair, bob = f ? 0 : 0;
@@ -53,12 +53,12 @@
       }
       if (s.apron) for (let y = 17; y <= hem - 1; y++) span(y, 7, 10, s.apron);
       /* torso */
-      for (let y = 12; y <= 17; y++) span(y, 6, 11, body);
+      for (let y = 12; y <= 17; y++) span(y, 6 - b0, 11 + b0, body);
       if (s.under) { px(8, 12, s.under); px(9, 12, s.under); px(8, 13, s.under); }
-      if (s.belt) { span(17, 6, 11, s.belt); px(8, 17, s.buckle); px(9, 17, s.buckle); if (s.pouch) { span(17, 11, 12, s.pouch); span(18, 11, 12, s.pouch); } }
+      if (s.belt) { span(17, 6 - b0, 11 + b0, s.belt); px(8, 17, s.buckle); px(9, 17, s.buckle); if (s.pouch) { span(17, 11, 12, s.pouch); span(18, 11, 12, s.pouch); } }
       if (s.sash) { for (let i = 0; i < 6; i++) px(6 + i, 12 + i, s.sash[1]); }
       /* arms */
-      [[4, 5, sw], [12, 13, -sw]].forEach((A) => {
+      [[4 - b0, 5 - b0, sw], [12 + b0, 13 + b0, -sw]].forEach((A) => {
         for (let y = 12 + A[2]; y <= 18 + A[2]; y++) span(y, A[0], A[1], body);
         if (s.cuff) span(18 + A[2], A[0], A[1], s.cuff);
         px(A[0], 19 + A[2], skin[1]); px(A[1], 19 + A[2], skin[2]); px(A[0], 20 + A[2], skin[2]);
@@ -80,9 +80,9 @@
         const x0 = (y < 19 ? 6 : y < 21 ? 5 : s.len === 'long' && y >= 23 ? 3 : 4) - (y >= 19 ? (s.wide | 0) : 0);
         span(y, x0, 17 - x0, body); if (y === hem && s.trim) span(y, x0, 17 - x0, s.trim);
       }
-      for (let y = 12; y <= 17; y++) span(y, 6, 11, body);
-      if (s.belt) span(17, 6, 11, s.belt);
-      [[4, 5, sw], [12, 13, -sw]].forEach((A) => { for (let y = 12 + A[2]; y <= 18 + A[2]; y++) span(y, A[0], A[1], body); px(A[0], 19 + A[2], skin[1]); px(A[1], 19 + A[2], skin[2]); });
+      for (let y = 12; y <= 17; y++) span(y, 6 - b0, 11 + b0, body);
+      if (s.belt) span(17, 6 - b0, 11 + b0, s.belt);
+      [[4 - b0, 5 - b0, sw], [12 + b0, 13 + b0, -sw]].forEach((A) => { for (let y = 12 + A[2]; y <= 18 + A[2]; y++) span(y, A[0], A[1], body); px(A[0], 19 + A[2], skin[1]); px(A[1], 19 + A[2], skin[2]); });
       if (s.cape) { for (let y = 12; y <= (s.capeLen || hem) + 1; y++) { const x0 = y < 14 ? 4 : y < 18 ? 3 : 3 - (y > 22 ? 1 : 0); span(y, x0, 17 - x0, s.cape); }
         for (let y = 14; y <= (s.capeLen || hem); y += 3) { px(8, y, s.cape[2]); px(9, y + 1, s.cape[2]); } if (s.trim) span((s.capeLen || hem) + 1, 3, 14, s.trim); }
       if (s.style === 'long') { for (let y = 9; y <= (s.hairLen || 17); y++) span(y, y > 14 ? 6 : 5, y > 14 ? 11 : 12, hair); }
@@ -146,7 +146,7 @@
       if (s.staff) {
         const x = d === 1 ? 3 : d === 2 ? 13 : 14;
         for (let y = 9; y <= 26; y++) px(x, y, s.staff[y % 6 === 0 ? 0 : y % 6 === 3 ? 2 : 1]);
-        px(x - 1, 8, s.staff[0]); px(x, 8, s.staff[0]); px(x, 7, s.staff[1]); px(x + 1, 8, s.staff[2]);
+        if (s.spear) { px(x, 6, s.staff[0]); px(x, 5, s.staff[0]); px(x, 4, s.staff[0]); px(x - 1, 7, s.staff[1]); px(x + 1, 7, s.staff[1]); } else { px(x, 8, s.staff[0]); px(x, 7, s.staff[1]); px(x + (d === 2 ? 1 : 1), 6, s.staff[0]); }
       }
       if (s.tatter) {
         for (let x = 2; x <= 15; x++) { const cut = (x * 5 + (d ? 1 : 0)) % 3; P.g.clearRect(x, hem - cut + 1, 1, cut); }
@@ -156,6 +156,14 @@
     /* ---------------------------------------------------- head, drawn last per direction */
     function head(d) {
       const hair1 = hair, ff = s.floatY || 0;
+      if (s.style === 'helm') {
+        const m = s.helm, rows = d === 2 ? [[2, 7, 10], [3, 6, 11], [4, 5, 12], [5, 5, 12], [6, 5, 12], [7, 5, 12], [8, 5, 12], [9, 5, 12], [10, 6, 11]] : [[2, 7, 10], [3, 6, 11], [4, 5, 12], [5, 5, 12], [6, 5, 12], [7, 5, 12], [8, 5, 12], [9, 5, 12], [10, 6, 11]];
+        rows.forEach((r) => span(r[0], r[1], r[2], m));
+        if (d === 0) { span(7, 6, 11, ['#0c0a10', '#0c0a10', '#0c0a10']); px(7, 7, s.eyes || '#ffb050'); px(10, 7, s.eyes || '#ffb050'); for (let y = 8; y <= 10; y++) px(8, y, m[2]); px(9, 8, m[2]); span(5, 7, 10, [m[0], m[0], m[1]]); }
+        else if (d === 2) { span(7, 9, 12, ['#0c0a10', '#0c0a10', '#0c0a10']); px(11, 7, s.eyes || '#ffb050'); px(13, 8, m[1]); px(13, 9, m[2]); }
+        if (s.plume) { span(1, 8, 10, s.plume); span(0, 9, 10, s.plume); px(d === 2 ? 5 : 11, 1, s.plume[1]); px(d === 2 ? 4 : 12, 2, s.plume[2]); if (d === 2) { px(4, 3, s.plume[1]); px(4, 4, s.plume[2]); } }
+        return;
+      }
       if (d === 0) {
         const rows = [[3, 7, 10], [4, 6, 11], [5, 5, 12], [6, 5, 12], [7, 5, 12], [8, 5, 12], [9, 6, 11], [10, 7, 10]];
         rows.forEach((r) => span(r[0], r[1], r[2], skin));
@@ -178,6 +186,7 @@
         if (s.bigEyes) { px(7, 7, ec); px(7, 8, ec); px(10, 7, ec); px(10, 8, ec); } else { px(7, 7, ec); px(10, 7, ec); }
         if (s.eyeGlow) { px(6, 7, s.eyeGlow); px(11, 7, s.eyeGlow); }
         if (!s.mask) { px(8, 9, skin[2]); px(9, 9, mix(skin[2], '#6a2a30', 0.35)); px(9, 8, skin[2]); }
+        if (s.beard) { span(9, 6, 11, hair); span(10, 7, 10, [hair[1], hair[1], hair[2]]); px(8, 9, hair[2]); px(9, 9, hair[2]); px(7, 8, hair[1]); px(10, 8, hair[1]); }
         if (s.hat) hatDraw(false);
       } else if (d === 1) {
         [[3, 7, 10], [4, 6, 11], [5, 5, 12], [6, 5, 12], [7, 5, 12], [8, 5, 12], [9, 6, 11], [10, 7, 10]].forEach((r) => span(r[0], r[1], r[2], s.style === 'hood' ? s.hood : hair));
@@ -203,6 +212,7 @@
           if (s.style === 'braid') { px(5, 9, hair[1]); px(4, 10, hair[1]); px(4, 11, hair[2]); px(4, 12, hair[1]); }
         }
         const ec = s.eyes || '#17121a'; px(11, 7, ec); if (s.eyeGlow) px(12, 7, s.eyeGlow);
+        if (s.beard) { span(9, 9, 12, hair); span(10, 9, 11, [hair[1], hair[1], hair[2]]); px(13, 9, hair[1]); }
         if (s.hat) hatDraw(true);
       }
     }
@@ -273,7 +283,7 @@
   });
   Art.npc.wren = build({
     skin: SKIN.fair, hair: ['#f8e4a8', '#dcb870', '#a88444'], style: 'braid', cloth: ['#c25a56', '#9a3e3e', '#662828'], len: 'short', trim: ['#e0c890', '#b89c60', '#806c3c'], pants: ['#5a4030', '#3e2c20', '#281c14'], boots: ['#4a3a30', '#32261e', '#20170f'],
-    belt: ['#e0c890', '#b89c60', '#806c3c'], buckle: '#f0e0a0', bigEyes: true, eyes: '#2a1a1a', cape: ['#9a3e3e', '#7a2c2c', '#521c1c'], capeLen: 20, stretch: -4,
+    belt: ['#e0c890', '#b89c60', '#806c3c'], buckle: '#f0e0a0', bigEyes: true, eyes: '#2a1a1a', cape: ['#9a3e3e', '#7a2c2c', '#521c1c'], capeLen: 20, stretch: -3, wide: 1,
   });
   Art.npc.hexcaller = build({
     stretch: 2, bell: true, tatter: true,
@@ -486,4 +496,16 @@
 
   /* ---- Thrall (raised dead) reuses the wretch body in a pale spectral grading ---- */
   Art.facing = function (set, dirIdx, frame) { return dirIdx === 1 ? set.up[frame] : dirIdx === 0 ? set.down[frame] : set.side[frame]; };
+
+  Art.npc.corwin = build({
+    skin: SKIN.tan, hair: ['#7a5a3c', '#523a26', '#33231a'], style: 'short', beard: true, broad: 1, stretch: 1, eyes: '#17121a',
+    cloth: ['#78884e', '#566638', '#37422a'], len: 'coat', trim: ['#7a5a3a', '#5a4026', '#3a2818'], pants: ['#4a3a2c', '#382c20', '#261e16'], boots: ['#4a3a2c', '#32261c', '#201810'],
+    cape: ['#425030', '#323e24', '#222a18'], capeLen: 22, pauldron: ['#9a7a50', '#74583a', '#4e3a26'], belt: ['#6a4a30', '#4a3222', '#2e1e14'], buckle: '#c8a850', pouch: ['#7a5a38', '#5a4028', '#3a281a'],
+    staff: ['#c8a070', '#8a6a44', '#5a4228'], cuff: ['#6a4a30', '#4a3222', '#2e1e14'],
+  });
+  Art.npc.ilse = build({
+    skin: SKIN.fair, hair: ['#c8c8d0', '#8a8a98', '#5a5a68'], style: 'helm', helm: ['#d4dae6', '#8e96a8', '#5a6074'], plume: ['#d85068', '#a02c44', '#681828'], eyes: '#ffb050', broad: 1, stretch: 1,
+    cloth: ['#6a7a9c', '#4c5a7c', '#323c58'], len: 'coat', trim: ['#d4dae6', '#8e96a8', '#5a6074'], trim2: ['#c04058', '#8a2438', '#5a1424'], pants: ['#3c3e4c', '#2c2e3a', '#1e2028'], boots: ['#5a6074', '#3e4356', '#292d3a'],
+    pauldron: ['#d4dae6', '#8e96a8', '#5a6074'], belt: ['#4a3a30', '#33271f', '#221914'], buckle: '#e8c860', staff: ['#e8ecf4', '#8a7050', '#5a4430'], spear: true, cuff: ['#8e96a8', '#6a7288', '#464c5e'],
+  });
 })();

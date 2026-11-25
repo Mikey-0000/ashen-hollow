@@ -148,7 +148,7 @@
     b.enemy('hound', 18, 35, { when: 'night' }); b.enemy('hound', 22, 34, { when: 'night' });
     b.enemy('wisp', 32, 30, { when: 'dim' }); b.enemy('wisp', 36, 33, { when: 'dim' });
     [[40, 4], [42, 15], [10, 5], [26, 3], [48, 22], [14, 30]].forEach((p) => b.prop('crowspot', p[0], p[1], { crow: true }));
-    b.npc('marta', 10, 16); b.npc('aldric', 45, 28); b.npc('wren', 9, 29);
+    b.npc('marta', 10, 16); b.npc('aldric', 45, 28); b.npc('wren', 9, 29); b.npc('corwin', 20, 24); b.npc('ilse', 32, 24);
     /* ambient light */
     b.light(29.5, 3.5, '#a8b8ff', 40, { shadowless: true }); b.light(45.5, 33.5, '#7fa6ff', 40);
     b.zone('The Laid Table', 18, 4, 13, 9, { discover: 'The Inn of the Laid Table', xp: 15 }); b.zone('Marta\'s Garden', 4, 6, 13, 13, { discover: 'Marta\'s Garden', xp: 10 });

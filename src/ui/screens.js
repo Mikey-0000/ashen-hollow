@@ -155,9 +155,24 @@
   }
   /* ---- skills ---- */
   const BR = AH.SkillBranches;
+  /* the tree is a grid: move to the nearest node in the direction pressed; at an edge, left/right step to the next discipline */
+  const skillXY = (n) => (n.br === 'general' ? [8 + (n.x % 2) * 30, 38 + (n.y + 2 * Math.floor(n.x / 2)) * 31] : [8 + n.x * 30, 44 + n.y * 40]);
+  function skillStep(nodes, cur, dx, dy) {
+    const c = skillXY(nodes[cur]); let best = -1, bs = 1e9;
+    nodes.forEach((n, i) => { if (i === cur) return; const q = skillXY(n), ax = q[0] - c[0], ay = q[1] - c[1], along = dx ? ax * dx : ay * dy, off = Math.abs(dx ? ay : ax); if (along <= 3) return; const sc = along + off * 2.2; if (sc < bs) { bs = sc; best = i; } });
+    return best;
+  }
   function bookSkills(dt, Gm) {
-    if (I.repeat('left')) { B.sel = (B.sel + 5) % 6; B.sel2 = 0; AH.Audio.sfx('ui_move'); } if (I.repeat('right')) { B.sel = (B.sel + 1) % 6; B.sel2 = 0; AH.Audio.sfx('ui_move'); }
-    const nodes = Object.values(AH.Skills).filter((n) => n.br === BR[B.sel].id).sort((a, b) => a.y - b.y || a.x - b.x); if (I.repeat('up')) { B.sel2 = (B.sel2 + nodes.length - 1) % nodes.length; AH.Audio.sfx('ui_move'); } if (I.repeat('down')) { B.sel2 = (B.sel2 + 1) % nodes.length; AH.Audio.sfx('ui_move'); }
+    let nodes = Object.values(AH.Skills).filter((n) => n.br === BR[B.sel].id).sort((a, b) => a.y - b.y || a.x - b.x);
+    B.sel2 = Math.min(B.sel2, nodes.length - 1);
+    const dirs = [['left', -1, 0], ['right', 1, 0], ['up', 0, -1], ['down', 0, 1]];
+    for (const d of dirs) {
+      if (!I.repeat(d[0])) continue;
+      const j = skillStep(nodes, B.sel2, d[1], d[2]);
+      if (j >= 0) { B.sel2 = j; AH.Audio.sfx('ui_move'); }
+      else if (d[1]) { const y0 = skillXY(nodes[B.sel2])[1]; B.sel = (B.sel + (d[1] > 0 ? 1 : 5)) % 6; nodes = Object.values(AH.Skills).filter((n) => n.br === BR[B.sel].id).sort((a, b) => a.y - b.y || a.x - b.x); let bi = 0, bd = 1e9; nodes.forEach((n, i) => { const q = skillXY(n), dd = Math.abs(q[1] - y0) * 2 + (d[1] > 0 ? q[0] : -q[0]); if (dd < bd) { bd = dd; bi = i; } }); B.sel2 = bi; AH.Audio.sfx('ui_move'); }
+      else { /* wrap vertically to the far end of the column */ const c = skillXY(nodes[B.sel2]); let bi = B.sel2, bd = 1e9; nodes.forEach((n, i) => { const q = skillXY(n), dd = Math.abs(q[0] - c[0]) * 3 - (d[2] > 0 ? -q[1] : q[1]); if (dd < bd) { bd = dd; bi = i; } }); B.sel2 = bi; AH.Audio.sfx('ui_move'); }
+    }
     if (confirm()) { const n = nodes[B.sel2]; if (!Gm.buySkill(n.id)) { AH.Audio.sfx('ui_deny'); if (!Gm.skills[n.id]) Gm.toast(Gm.skillPoints < n.cost ? 'Not enough skill points.' : 'Requires: ' + n.req.map((r) => AH.Skills[r].name).join(', '), '#b06a6a'); } }
   }
   function drawSkills(g, Gm, time, x, y, w, h) {
