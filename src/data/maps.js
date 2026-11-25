@@ -142,7 +142,7 @@
     b.forest(2, 2, 52, 36, ['oak', 'dead', 'autumn', 'dead'], 0.34, 4);
     b.deco(2, 2, 52, 36, 70, 'tuft', [G, M]); b.deco(2, 2, 52, 36, 26, 'bush', [G, M]); b.deco(2, 2, 52, 36, 10, 'deadbush', [G, M]); b.deco(2, 2, 52, 36, 10, 'rock', [G, M, D]); b.deco(2, 30, 30, 8, 6, 'fern', [M, G]);
     b.prop('stump', 21, 17, { solid: true }); b.prop('stump', 52, 21, { solid: true });
-    b.prop('hanging', 14, 22, { solid: true, ox: 6 });
+    b.prop('hanging', 14, 22, { solid: true, ox: 3, anim: 4, animSpeed: 1.4, shadow: true });
     /* enemies, ecology & life */
     b.enemy('wretch', 16, 23, { when: 'any' }); b.enemy('wretch', 44, 28, { when: 'night' }); b.enemy('wretch', 41, 30, { when: 'night' });
     b.enemy('hound', 18, 35, { when: 'night' }); b.enemy('hound', 22, 34, { when: 'night' });
@@ -199,7 +199,7 @@
     b.prop('tablet', 46, 9, { solid: true, act: { type: 'lore', id: 'coven_altar', prompt: 'Read altar' } });
     [[44, 8], [57, 9], [45, 16], [56, 16]].forEach((p) => b.prop('poppet', p[0], p[1], { ox: 4 }));
     b.prop('candles', 48, 12, { anim: 5, light: { r: 40, color: '#e8a0ff', flicker: 0.3, y: -6 } }); b.prop('candles', 52, 14, { anim: 5, light: { r: 40, color: '#e8a0ff', flicker: 0.3, y: -6 } });
-    b.prop('hanging', 49, 7, { solid: true, ox: 6 });
+    b.prop('hanging', 49, 7, { solid: true, ox: 3, anim: 4, animSpeed: 1.4, shadow: true });
     /* hunter's cabin */
     b.prop('chest', 21, 36, { solid: true, act: { type: 'chest', id: 'hunter_chest', items: [{ id: 'cloak_wolf', n: 1 }, { id: 'tincture', n: 1 }], prompt: 'Open chest' } });
     b.prop('bed', 25, 39, { solid: true }); b.prop('bones', 24, 39, { ox: 8 }); b.prop('tablet', 23, 35, { solid: true, act: { type: 'lore', id: 'hunter_note', prompt: 'Read the last page' } }); b.prop('candle', 22, 39, { anim: 5, light: { r: 36, color: '#ffc070', flicker: 0.3, y: -6 }, ignite: true });

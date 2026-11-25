@@ -155,7 +155,35 @@
   spr.cobweb = (function () { const P = S.painter(18, 18); [[0, 0, 17, 0], [0, 0, 0, 17], [0, 0, 16, 16], [0, 0, 12, 17], [0, 0, 17, 12]].forEach((l) => P.line(l[0], l[1], l[2], l[3], 'rgba(220,220,230,0.55)')); [5, 9, 13].forEach((r) => { for (let a = 0; a < 20; a++) { const t = (a / 19) * Math.PI / 2; P.px(Math.round(Math.cos(t) * r), Math.round(Math.sin(t) * r), 'rgba(220,220,230,0.4)'); } }); return S.fromCanvas(P.c, 0, 0); })();
   spr.hayBale = (function () { const P = S.painter(26, 20); P.ell(13, 11, 11, 8, ['#c8a850', '#9a7e38', '#6a5222'], 4, 0.1); for (let i = 0; i < 14; i++) P.line(3 + Math.floor(U.hash(i, 1, 4) * 20), 5 + Math.floor(U.hash(i, 2, 4) * 12), 6 + Math.floor(U.hash(i, 3, 4) * 20), 5 + Math.floor(U.hash(i, 4, 4) * 12), '#6a5222'); return finish(P, 13, 18, '#0a0806'); })();
   spr.poppet = (function () { const P = S.painter(10, 16); P.rect(3, 7, 4, 7, '#8a7a5a'); P.disc(5, 4, 3, '#c9b48a'); P.px(4, 4, '#1a1214'); P.px(6, 4, '#1a1214'); P.rect(1, 8, 2, 1, '#8a7a5a'); P.rect(7, 8, 2, 1, '#8a7a5a'); P.line(5, 9, 5, 12, '#8a2e3c'); return finish(P, 5, 15, '#0a0806'); })();
-  spr.hanging = (function () { const P = S.painter(14, 30); P.line(7, 0, 7, 10, '#3a2a1e'); P.rect(4, 10, 6, 10, '#5a4a36'); P.disc(7, 8, 3, '#8a7a5a'); P.line(4, 13, 2, 20, '#5a4a36'); P.line(10, 13, 12, 20, '#5a4a36'); P.line(5, 20, 5, 28, '#4a3a28'); P.line(9, 20, 9, 28, '#4a3a28'); return finish(P, 7, 29, '#0a0806'); })();
+  spr.hanging = [-1, 0, 1, 0].map((sw) => { /* a gibbet with a straw effigy: stitched sack head, bound body, swaying on its rope */
+    const P = S.painter(26, 40), X = (y) => Math.round(sw * Math.max(0, y - 10) / 14);
+    /* post, beam, brace, footing */
+    P.rect(3, 6, 3, 33, '#3a2a1e'); P.rect(3, 6, 1, 33, '#5a4430'); P.rect(5, 6, 1, 33, '#2a1e14'); P.rect(3, 5, 20, 3, '#3a2a1e'); P.rect(3, 5, 20, 1, '#5a4430'); P.rect(3, 7, 20, 1, '#2a1e14');
+    P.line(6, 14, 11, 8, '#3a2a1e'); P.line(6, 15, 11, 9, '#2a1e14'); P.ell(4, 38, 5, 1, '#4a4650'); P.rect(1, 37, 7, 2, '#55525e'); P.px(2, 37, '#7a7684'); P.px(6, 38, '#3a3840');
+    P.rect(2, 11, 5, 1, '#6a4a30'); P.rect(2, 20, 5, 1, '#6a4a30'); /* rope lashings on the post */
+    /* a charm of feather and bone on a string */
+    P.line(9, 8, 9, 12, '#a8946a'); P.line(9, 12, 8 + (sw > 0 ? 1 : 0), 16, '#2a2630'); P.px(8 + (sw > 0 ? 1 : 0), 17, '#e0d6bc'); P.px(10, 12, '#e0d6bc');
+    /* rope to the effigy */
+    P.line(16, 8, 16 + X(14), 13, '#b09a6a'); P.px(15, 8, '#8a7648'); P.px(17, 8, '#8a7648');
+    const hx = 16 + X(16);
+    /* sack head */
+    P.ell(hx, 16, 4, 4, ['#c8aa70', '#a8894e', '#6e5530'], 3, 0.1); P.rect(hx - 2, 12, 5, 1, '#7a6038');
+    P.px(hx - 2, 15, '#2a1c10'); P.px(hx - 1, 16, '#2a1c10'); P.px(hx - 2, 17, '#2a1c10'); P.px(hx - 3, 16, '#2a1c10'); P.px(hx + 1, 15, '#2a1c10'); P.px(hx + 2, 16, '#2a1c10'); P.px(hx + 1, 17, '#2a1c10'); P.px(hx, 16, '#2a1c10'); /* stitched eyes */
+    for (let k = -2; k <= 2; k++) P.px(hx + k, 19 + (k % 2 ? 0 : 1) - 1, '#2a1c10'); /* crooked stitched mouth */
+    P.px(hx - 3, 14, '#e0c890'); P.px(hx - 2, 13, '#e0c890');
+    /* neck binding and body */
+    const bx = 16 + X(24);
+    P.rect(hx - 2, 20, 5, 1, '#6a4a30');
+    P.rect(bx - 3, 21, 7, 10, '#a08a50'); P.rect(bx - 3, 21, 2, 10, '#bca468'); P.rect(bx + 2, 21, 2, 10, '#6e5628');
+    for (let k = 0; k < 7; k++) P.px(bx - 3 + k, 22 + (k * 3) % 9, k % 2 ? '#cdb878' : '#7a6430');
+    P.rect(bx - 3, 24, 7, 1, '#6a4a30'); P.rect(bx - 3, 29, 7, 1, '#6a4a30'); P.px(bx + 2, 24, '#c23a45'); P.px(bx + 3, 25, '#c23a45'); P.px(bx + 3, 26, '#8a2a34'); /* a scrap of red cloth */
+    /* arms and legs of bound straw, ragged at the ends */
+    P.limb(bx - 3, 22, bx - 8 + X(31) - X(24), 28, 2, 2, '#8e7840'); P.limb(bx + 3, 22, bx + 8 + X(31) - X(24), 28, 2, 2, '#8e7840');
+    P.px(bx - 9 + X(31) - X(24), 29, '#c4aa68'); P.px(bx - 8 + X(31) - X(24), 30, '#a08a50'); P.px(bx + 9 + X(31) - X(24), 29, '#c4aa68'); P.px(bx + 8 + X(31) - X(24), 30, '#a08a50');
+    P.limb(bx - 1, 31, bx - 2 + X(37) - X(24), 36, 2, 2, '#8e7840'); P.limb(bx + 2, 31, bx + 3 + X(37) - X(24), 36, 2, 2, '#8e7840');
+    for (let k = -1; k <= 1; k++) { P.px(bx - 2 + k + X(37) - X(24), 37, k ? '#c4aa68' : '#6e5628'); P.px(bx + 3 + k + X(37) - X(24), 37, k ? '#a08a50' : '#c4aa68'); }
+    return S.outline(S.fromCanvas(P.c, 4, 39), '#0a0806');
+  });
   spr.stump = (function () { const P = S.painter(22, 16); P.ell(11, 10, 9, 5, ['#6a5240', '#463428', '#281c14'], 4, 0.1); P.ell(11, 8, 7, 3, ['#8a7258', '#6a5240', '#463428'], 5, 0); P.line(7, 8, 15, 8, '#463428'); P.line(9, 7, 13, 9, '#463428'); return finish(P, 11, 14, '#08060a'); })();
   spr.rock = [1, 2, 3].map((s) => { const P = S.painter(24, 18); P.blob(12, 10, 7 + s, ['#7a7886', '#55536a', '#33313f'], s * 5, 3); P.speckle(4, 4, 16, 12, ['#3e5a34', '#58783f'], 6, s); return finish(P, 12, 16, '#08080c'); });
 
