@@ -156,7 +156,7 @@
   /* ---- skills ---- */
   const BR = AH.SkillBranches;
   /* the tree is a grid: move to the nearest node in the direction pressed; at an edge, left/right step to the next discipline */
-  const skillXY = (n) => (n.br === 'general' ? [8 + (n.x % 2) * 30, 38 + (n.y + 2 * Math.floor(n.x / 2)) * 31] : [8 + n.x * 30, 44 + n.y * 40]);
+  const skillXY = (n) => (n.br === 'general' ? [8 + (n.x % 2) * 30, 38 + (n.y + 2 * Math.floor(n.x / 2)) * 31] : [8 + n.x * 30, 44 + n.y * 30]);
   function skillStep(nodes, cur, dx, dy) {
     const c = skillXY(nodes[cur]); let best = -1, bs = 1e9;
     nodes.forEach((n, i) => { if (i === cur) return; const q = skillXY(n), ax = q[0] - c[0], ay = q[1] - c[1], along = dx ? ax * dx : ay * dy, off = Math.abs(dx ? ay : ax); if (along <= 3) return; const sc = along + off * 2.2; if (sc < bs) { bs = sc; best = i; } });
@@ -177,10 +177,10 @@
   }
   function drawSkills(g, Gm, time, x, y, w, h) {
     Font.draw(g, 'Skill points: ' + Gm.skillPoints, x + 12, y + 10, C.gold); Font.draw(g, 'Level ' + Gm.level + (Gm.level < AH.MAX_LEVEL ? '   XP ' + Gm.xp + '/' + AH.xpFor(Gm.level) : '   (max)'), x + w - 12, y + 10, C.dim, { align: 'right' });
-    const pos = (n, bx, by) => n.br === 'general' ? [bx + 8 + (n.x % 2) * 30, by + 38 + (n.y + 2 * Math.floor(n.x / 2)) * 31] : [bx + 8 + n.x * 30, by + 44 + n.y * 40];
+    const pos = (n, bx, by) => n.br === 'general' ? [bx + 8 + (n.x % 2) * 30, by + 38 + (n.y + 2 * Math.floor(n.x / 2)) * 31] : [bx + 8 + n.x * 30, by + 44 + n.y * 30];
     BR.forEach((b, bi) => { const bx = x + 10 + bi * 73, by = y + 24, on = bi === B.sel, known = b.id === 'general' || Gm.player.schools[b.school]; UI.sub(g, bx, by, 69, 158, on ? 'rgba(40,30,20,0.6)' : null); Font.draw(g, b.name, bx + 34, by + 4, known ? b.col : '#5a5448', { align: 'center' }); if (b.school !== 'neutral') g.drawImage(AH.Icons.sigil(b.school), bx + 22, by + 14, 24, 24);
       const nodes = Object.values(AH.Skills).filter((n) => n.br === b.id).sort((a, c) => a.y - c.y || a.x - c.x);
-      nodes.forEach((n, ni) => { const [nx, ny] = pos(n, bx, by); n.req.forEach((r) => { const q = AH.Skills[r], [qx, qy] = pos(q, bx, by); g.fillStyle = Gm.skills[r] ? b.col : '#3a3640'; const ax = qx + 10, ay = qy + 10, bx2 = nx + 10, by2 = ny + 10; g.fillRect(Math.min(ax, bx2), Math.min(ay, by2), Math.abs(bx2 - ax) + 1, Math.abs(by2 - ay) + 1); });
+      nodes.forEach((n, ni) => { const [nx, ny] = pos(n, bx, by); n.req.forEach((r) => { const q = AH.Skills[r], [qx, qy] = pos(q, bx, by); g.fillStyle = Gm.skills[r] ? b.col : '#3a3640'; const ax = qx + 10, ay = qy + 10, bx2 = nx + 10, by2 = ny + 10; if (ax === bx2 || ay === by2) g.fillRect(Math.min(ax, bx2), Math.min(ay, by2), Math.abs(bx2 - ax) + 1, Math.abs(by2 - ay) + 1); else { g.fillRect(ax, Math.min(ay, by2), 1, Math.abs(by2 - ay) + 1); g.fillRect(Math.min(ax, bx2), by2, Math.abs(bx2 - ax) + 1, 1); } });
         const own = Gm.skills[n.id], can = Gm.canBuy(n.id); g.fillStyle = '#05040a'; g.fillRect(nx - 1, ny - 1, 22, 22); g.globalAlpha = own ? 1 : can ? 0.85 : 0.35; g.drawImage(AH.Icons.of({ icon: n.icon, scheme: b.school === 'neutral' ? 'neutral' : b.school }, own ? b.col : null), nx + 2, ny + 2); g.globalAlpha = 1; g.fillStyle = own ? b.col : can ? C.gold : '#3a3640'; g.fillRect(nx - 1, ny - 1, 22, 1); g.fillRect(nx - 1, ny + 20, 22, 1); g.fillRect(nx - 1, ny - 1, 1, 22); g.fillRect(nx + 20, ny - 1, 1, 22); if (on && ni === B.sel2) UI.select(g, nx - 3, ny - 3, 26, 26, time); }); });
     const nodes = Object.values(AH.Skills).filter((n) => n.br === BR[B.sel].id).sort((a, c) => a.y - c.y || a.x - c.x), n = nodes[B.sel2]; if (n) { UI.sub(g, x + 10, y + 186, w - 20, 44); Font.draw(g, n.name + (Gm.skills[n.id] ? '  (learned)' : '  - cost ' + n.cost), x + 16, y + 187, Gm.skills[n.id] ? '#9ae890' : C.gold); Font.wrap(n.desc, w - 36).forEach((l, i) => Font.draw(g, l, x + 16, y + 198 + i * 10, C.ink)); if (n.req.length) Font.draw(g, 'Requires ' + n.req.map((r) => AH.Skills[r].name).join(', '), x + w - 16, y + 187, C.dim, { align: 'right' }); }
     Font.draw(g, '< > branch   ^ v node   Enter learn', x + w - 16, y + 214, '#5a5448', { align: 'right' });

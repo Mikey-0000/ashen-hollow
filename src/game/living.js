@@ -82,7 +82,7 @@
     if (Math.random() < dt * 40) P.burst(x + U.rr(-9, 9), y - U.rr(2, 18), 1, { min: 4, max: 18, vz: [30, 70], g: -20, life: [0.3, 0.8], size: 2, size2: 0, c: ['#ff9a3a', '#ffd070', '#ff5a20'], add: true, drag: 1.5 });
     if (Math.random() < dt * 10) P.burst(x + U.rr(-8, 8), y - 18, 1, { min: 2, max: 8, vz: [20, 40], g: -10, life: [0.8, 1.6], size: 2, size2: 4, c: ['#4a4650', '#2a2830'], drag: 2 });
     if (o.spread && o.burn < 2.6) { o.spread = false; w.objs.forEach((q) => { if (q !== o && q.d.living === 'thorns' && !q.burn && !q.burnt && U.dist(q.x, q.y, x, y) < 26) ignite(q); }); }
-    o.dmgT -= dt; if (o.dmgT <= 0) { o.dmgT = 0.5; w.enemies.forEach((e) => { if (e.dead || e.ally || U.dist(e.x, e.y, x, y) > 20) return; AH.Combat.hit(e, 5, { src: G_().player, ang: 0, school: 'astral', tags: ['spark'] }); }); }
+    o.dmgT -= dt; if (o.dmgT <= 0) { o.dmgT = 0.5; w.enemies.forEach((e) => { if (e.dead || e.ally || U.dist(e.x, e.y, x, y) > 20) return; AH.Combat.hit(e, 5, { src: G_().player, ang: 0, school: 'phys', tags: ['fire'] }); }); }
     if (o.burn <= 0) finishBurn(o);
   }
   function finishBurn(o, silent) {
@@ -143,6 +143,21 @@
         else if (kind === 'bellhang') b.prop('bellhang', tx, ty, { living: 'bellhang', ox: 3, shadow: true });
       }
     };
+    /* tiles you can walk to from the entrance without opening anything */
+    const INF0 = AH.Tiles.INFO || {}, blockedObj = new Set(); b.objs.forEach((q) => { if (q.solid && typeof q.tx === 'number') (q.solidTiles || [[q.tx, q.ty]]).forEach((t) => blockedObj.add(t[1] * b.w + t[0])); });
+    const reach = new Uint8Array(b.w * b.h), sp0 = b.spawns.start || b.spawns[Object.keys(b.spawns)[0]];
+    if (sp0) { const st = [[sp0.tx, sp0.ty]]; reach[sp0.ty * b.w + sp0.tx] = 1; while (st.length) { const c = st.pop(); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach((d) => { const nx = c[0] + d[0], ny = c[1] + d[1]; if (!b.inb(nx, ny)) return; const i = ny * b.w + nx; if (reach[i]) return; const t = b.get(nx, ny), inf = INF0[t]; if (t === ID.WATER || t === 0 || (inf && inf.solid) || blockedObj.has(i)) return; reach[i] = 1; st.push([nx, ny]); }); } }
+    /* gear chests, tucked against walls and edges away from the main routes */
+    const GEAR = { hamlet: ['mantle_frostfur', 'viper_stiletto'], thornwood: [], catacombs: ['ember_cleaver', 'cloak_stormweave', 'rime_ring', 'thunder_bead'] }[id] || [];
+    GEAR.forEach((gid, gi) => {
+      for (let i = 0; i < 2400; i++) {
+        const tx = 3 + Math.floor(b.rng() * (b.w - 6)), ty = 3 + Math.floor(b.rng() * (b.h - 6)), t = b.get(tx, ty);
+        const okTile = id === 'catacombs' ? (t === ID.CRYPT || t === ID.FLAG) : (t === ID.GRASS || t === ID.MOSS);
+        const INF = AH.Tiles.INFO || {}; const walls = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter((d) => { const q = b.get(tx + d[0], ty + d[1]); const i = INF[q]; return q === ID.WATER || q === 0 || (i && i.solid); }).length;
+        if (!okTile || (walls < 1 && i < 1200) || !sp0 || !reach[(ty + 1) * b.w + tx] && !reach[ty * b.w + tx - 1] && !reach[ty * b.w + tx + 1] && !reach[(ty - 1) * b.w + tx] || !b.isFree(tx, ty, 1) || occupied(tx, ty) || !farFrom(tx, ty, 4, pts) || !farFrom(tx, ty, i < 1200 ? 8 : 4, taken)) continue;
+        taken.push([tx, ty]); b.prop('chest', tx, ty, { solid: true, shadow: true, act: { type: 'chest', id: 'arsenal_' + id + '_' + gi, items: [{ id: gid, n: 1 }], prompt: 'Open chest' } }); break;
+      }
+    });
     tryPlace('lantern', plan.lantern, null, 7, (tx, ty) => natural.indexOf(b.get(tx, ty)) >= 0 && edge(tx, ty));
     tryPlace('bellhang', plan.bellhang, null, 9, (tx, ty) => (id === 'catacombs' ? natural : [ID.GRASS, ID.MOSS, ID.DIRT, ID.LEAVES]).indexOf(b.get(tx, ty)) >= 0 && edge(tx, ty));
     /* thorn thickets in 2-3 tile patches off the beaten path; some guard a cache */
@@ -153,8 +168,8 @@
       let clear = true; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const t = b.get(tx + dx, ty + dy); if (t === ID.DIRT || t === ID.COBBLE || t === ID.WATER || t === ID.VOID || t === ID.WOOD) clear = false; }
       if (!clear) continue; taken.push([tx, ty]); patches++;
       const cells = [[0, 0]]; [[1, 0], [0, 1], [1, 1], [-1, 0]].forEach((d) => { if (cells.length < 2 + Math.floor(b.rng() * 2) && ok(tx + d[0], ty + d[1])) cells.push(d); });
-      const cache = patches % 3 === 0 ? (b.rng() < 0.5 ? 'soul_ash' : 'bone_dust') : null;
-      cells.forEach((d, j) => b.prop('thorns', tx + d[0], ty + d[1], { living: 'thorns', solid: true, shadow: true, variant: Math.floor(b.rng() * 3), ox: 0, cache: j === 0 ? cache : null, cacheN: 2 }));
+      const GC = ['wildfire_seed', 'cape_greenwarden', 'rime_glaive']; const cache = patches % 3 === 0 ? (id === 'thornwood' ? GC[(patches / 3 - 1) % 3] : (b.rng() < 0.5 ? 'soul_ash' : 'bone_dust')) : null;
+      cells.forEach((d, j) => b.prop('thorns', tx + d[0], ty + d[1], { living: 'thorns', solid: true, shadow: true, variant: Math.floor(b.rng() * 3), ox: 0, cache: j === 0 ? cache : null, cacheN: cache && /^(soul_ash|bone_dust)$/.test(cache) ? 2 : 1 }));
     }
   }
   ['hamlet', 'thornwood', 'catacombs'].forEach((id) => {

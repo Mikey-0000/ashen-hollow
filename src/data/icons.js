@@ -9,6 +9,12 @@
     steel: ['#a8aebb', '#e0e4ee', '#5a606c'], wood: ['#a07a50', '#d0a874', '#5a4228'], red: ['#c23a45', '#ff8a90', '#6a1420'],
   };
   const M = {
+    flame(P, c) { P.ell(8, 10, 4, 4, c[2]); P.limb(8, 14, 8, 3, 7, 1, c[0]); P.limb(6, 12, 5, 6, 3, 1, c[0]); P.limb(11, 12, 12, 7, 3, 1, c[0]); P.ell(8, 11, 2, 3, c[1]); P.px(8, 8, '#fff'); },
+    snow(P, c) { for (let i = 0; i < 3; i++) { const a = (i / 3) * 3.1416; P.line(8 - Math.cos(a) * 6, 8 - Math.sin(a) * 6, 8 + Math.cos(a) * 6, 8 + Math.sin(a) * 6, c[0]); } [[8, 2], [8, 14], [2, 5], [14, 11], [14, 5], [2, 11]].forEach((p, i) => P.px(p[0], p[1], c[1])); P.disc(8, 8, 1, '#fff'); },
+    chain(P, c) { P.line(2, 12, 6, 6, c[0], 2); P.line(6, 6, 10, 10, c[0], 2); P.line(10, 10, 14, 3, c[0], 2); P.px(2, 12, c[1]); P.px(14, 3, c[1]); P.disc(6, 6, 1, c[1]); P.disc(10, 10, 1, c[1]); },
+    needles(P, c) { [[3, 12, 12, 3], [5, 13, 13, 6], [2, 9, 9, 2]].forEach((l, i) => { P.line(l[0], l[1], l[2], l[3], c[i % 2 ? 0 : 2]); P.px(l[2], l[3], c[1]); }); },
+    comet(P, c) { P.limb(2, 3, 10, 11, 1, 4, c[2]); P.limb(4, 2, 11, 9, 1, 3, c[0]); P.disc(11, 11, 3, c[0]); P.disc(11, 11, 1, c[1]); P.px(10, 10, '#fff'); },
+    cleaver(P, c) { P.rect(3, 3, 8, 7, c[0]); P.rect(3, 3, 8, 1, c[1]); P.rect(10, 4, 2, 5, c[2]); P.line(7, 10, 12, 14, '#6a4a30', 2); P.px(4, 4, '#fff'); },
     skull(P, c) { P.disc(8, 7, 4, c[0]); P.rect(6, 10, 5, 3, c[0]); P.rect(5, 6, 2, 2, c[2]); P.rect(9, 6, 2, 2, c[2]); P.px(8, 9, c[2]); P.px(7, 12, c[2]); P.px(9, 12, c[2]); P.px(6, 4, c[1]); P.px(7, 4, c[1]); },
     lance(P, c) { P.line(3, 12, 12, 3, c[2], 2); P.line(4, 11, 12, 3, c[0]); P.line(10, 5, 13, 2, c[1], 2); P.px(13, 2, '#fff'); P.line(3, 9, 5, 11, c[0]); },
     ward(P, c) { for (let i = 0; i < 6; i++) { const a = (i / 6) * 6.283; P.rect(Math.round(8 + Math.cos(a) * 4.5) - 1, Math.round(8 + Math.sin(a) * 4.5) - 1, 3, 2, i % 2 ? c[0] : c[1]); } P.disc(8, 8, 1, c[2]); },
