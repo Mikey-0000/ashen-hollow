@@ -310,7 +310,8 @@
       const G = this.G, cam = this.cam, p = G.player, time = this.time;
       const cx = Math.round(cam.x + cam.sx), cy = Math.round(cam.y + cam.sy), C = { x: cx, y: cy };
       g.fillStyle = '#050407'; g.fillRect(0, 0, W, H);
-      g.drawImage(this.ground, cx, cy, W, H, 0, 0, W, H);
+      if (AH.Hi && AH.Hi.on) { if (this._gh0 !== this.ground) { this._gh0 = this.ground; this._gh = AH.Hi.up(this.ground, 'aa'); } g.drawImage(this._gh, cx * 2, cy * 2, W * 2, H * 2, 0, 0, W, H); }
+      else g.drawImage(this.ground, cx, cy, W, H, 0, 0, W, H);
       AH.Tiles.drawWater(g, this.area, C, time);
       AH.Weather.drawClouds(g, C, time, AH.Lighting.daylight(G.hour));
       /* decals: corpses */
