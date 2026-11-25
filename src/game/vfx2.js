@@ -9,7 +9,7 @@
   'use strict';
   const AH = window.AH, U = AH.U, P = AH.Particles, Co = AH.Combat, M = AH.Magic, V = AH.VFX; if (!V) return;
   const G = () => AH.G, safe = (fn) => { try { return fn(); } catch (e) { if (AH.errors) AH.errors.push('vfx2: ' + e); } };
-  const S = () => { const s = G().settings; if (s.bloom === undefined) s.bloom = true; if (s.shafts === undefined) s.shafts = true; if (s.chaseCam === undefined) s.chaseCam = false; return s; };
+  const S = () => { const s = G().settings; if (s.bloom === undefined) s.bloom = true; if (s.shafts === undefined) s.shafts = true; if (s.chaseCam === undefined) s.chaseCam = false; if (s.firstPerson === undefined) s.firstPerson = false; return s; };
   const calm = () => !!G().settings.reduceFlash;
   const SCH = { necro: ['#7fe0c0', '#d4fff0', '#2a8a70'], druid: ['#8fd06a', '#e0ffb8', '#4a8a30'], blood: ['#d04050', '#ff9aa0', '#7a1420'], astral: ['#7fa6ff', '#e0eaff', '#3a56b0'], witch: ['#c27be0', '#f2d0ff', '#7a3ea0'] };
   const addFx = (w, o) => { o.k = 'vfx'; o.t = 0; w.fx.push(o); return o; };
@@ -131,16 +131,17 @@
 
   /* ---------------------------------------------------------------- 5. THIRD-PERSON CAMERA */
   const Z = (AH.Zoom = { z: 1, pulse: 0, rect: null, dx: 0, dy: 0, tmp: null, ax: 0, ay: 0 });
-  const zt = () => { const Gm = G(); return Gm.mode === 'play' && S().chaseCam && Gm.screen !== 'photo'; };
+  const zt = () => { const Gm = G(); return Gm.mode === 'play' && (S().chaseCam || S().firstPerson) && Gm.screen !== 'photo'; };
+  const fp = () => G().mode === 'play' && S().firstPerson && G().screen !== 'photo';
   Z.unmap = (m) => { const r = Z.rect; if (!r || Z.z < 1.002) return m; return { x: r.sx + m.x * r.sw / AH.W, y: r.sy + m.y * r.sh / AH.H, down: m.down, pressed: m.pressed }; };
   function zoom(g) {
     const Gm = G(), w = Gm.world, p = Gm.player, W = AH.W, H = AH.H, now = performance.now(), dt = Math.min(0.05, (now - (Z._t || now)) / 1000); Z._t = now;
-    const on = zt(), sprint = on && (p.state === 'dodge' ? -0.06 : 0), tgt = on ? 1.55 + sprint : 1;
+    const on = zt(), sprint = on && (p.state === 'dodge' ? -0.06 : 0), tgt = on ? (fp() ? 2.0 : 1.55) + sprint : 1;
     Z.z += (tgt - Z.z) * Math.min(1, dt * (on ? 4 : 7)); Z.pulse = Math.max(0, Z.pulse - dt * 4.5);
     if (Z.z < 1.004) { Z.rect = null; Z.z = Math.abs(Z.z - 1) < 0.004 ? 1 : Z.z; if (!on) return; }
     const k = Z.z + Z.pulse * 0.035 * (on ? 1 : 0);
     const fx = Math.cos(p.aimA || 0), fy = Math.sin(p.aimA || 0); Z.ax += (fx - Z.ax) * Math.min(1, dt * 2.2); Z.ay += (fy - Z.ay) * Math.min(1, dt * 2.2);
-    const lerp = Math.min(1, (Z.z - 1) / 0.55), Dx = W / 2 - Z.ax * 26 * lerp, Dy = H * (0.5 + 0.13 * lerp) - Z.ay * 16 * lerp;
+    const lerp = Math.min(1, (Z.z - 1) / 0.55), F = fp() ? 1 : 0, Dx = W / 2 - Z.ax * (26 + 30 * F) * lerp, Dy = H * (0.5 + (0.13 + 0.1 * F) * lerp) - Z.ay * (16 + 22 * F) * lerp; Z.px = Dx; Z.py = Dy;
     const sxp = p.x - w.cam.x, syp = p.y - 8 - w.cam.y, sw = W / k, sh = H / k;
     let sx = sxp - Dx / k, sy = syp - Dy / k; sx = U.clamp(sx, 0, W - sw); sy = U.clamp(sy, 0, H - sh); Z.rect = { sx, sy, sw, sh };
     const cv = g.canvas, BW = cv.width, BH = cv.height; if (!Z.tmp || Z.tmp.width !== BW || Z.tmp.height !== BH) { Z.tmp = document.createElement('canvas'); Z.tmp.width = BW; Z.tmp.height = BH; }
@@ -149,9 +150,20 @@
     g.drawImage(Z.tmp, sx / W * BW, sy / H * BH, sw / W * BW, sh / H * BH, 0, 0, BW, BH);
     /* depth: darken the edges a touch, as a lens would */
     const vg = g.createRadialGradient(BW / 2, BH * 0.55, BH * 0.38, BW / 2, BH * 0.55, BW * 0.62); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,' + (0.38 * lerp) + ')'); g.globalCompositeOperation = 'source-over'; g.fillStyle = vg; g.fillRect(0, 0, BW, BH);
+    if (fp() && lerp > 0.3) {
+      if (!Z.mk || Z.mk.width !== BW || Z.mk.height !== BH) { Z.mk = document.createElement('canvas'); Z.mk.width = BW; Z.mk.height = BH; }
+      const m = Z.mk.getContext('2d'), s2 = BW / W, ox = Dx * s2, oy = (Dy - 6 * k * 0.5) * s2, ang = Math.atan2(Z.ay, Z.ax), R = BW;
+      m.globalCompositeOperation = 'source-over'; m.clearRect(0, 0, BW, BH); m.fillStyle = 'rgba(2,2,8,' + (0.93 * lerp) + ')'; m.fillRect(0, 0, BW, BH);
+      m.globalCompositeOperation = 'destination-out';
+      [[0.98, 0.35], [0.8, 0.4], [0.62, 0.45]].forEach((c) => { m.globalAlpha = c[1]; m.beginPath(); m.moveTo(ox, oy); m.arc(ox, oy, R, ang - c[0], ang + c[0]); m.closePath(); m.fill(); });
+      m.globalAlpha = 1; const rg = m.createRadialGradient(ox, oy, 6 * s2, ox, oy, 46 * s2); rg.addColorStop(0, 'rgba(0,0,0,0.95)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); m.fillStyle = rg; m.beginPath(); m.arc(ox, oy, 46 * s2, 0, 6.283); m.fill();
+      g.globalCompositeOperation = 'source-over'; g.drawImage(Z.mk, 0, 0);
+    }
     g.restore();
   }
-  document.addEventListener('keydown', (e) => { if (e.code === 'F9') { e.preventDefault(); const Gm = G(); if (!Gm || Gm.mode !== 'play') return; const s = S(); s.chaseCam = !s.chaseCam; Gm.toast('Third-person camera: ' + (s.chaseCam ? 'on' : 'off'), '#9ab8ff'); } });
+  document.addEventListener('keydown', (e) => { if (e.code === 'F9') { e.preventDefault(); const Gm = G(); if (!Gm || Gm.mode !== 'play') return; const s = S(); s.chaseCam = !s.chaseCam; if (s.chaseCam) s.firstPerson = false; Gm.toast('Third-person camera: ' + (s.chaseCam ? 'on' : 'off'), '#9ab8ff'); }
+    if (e.code === 'F10') { e.preventDefault(); const Gm = G(); if (!Gm || Gm.mode !== 'play') return; const s = S(); s.firstPerson = !s.firstPerson; if (s.firstPerson) s.chaseCam = false; Gm.toast('First-person view: ' + (s.firstPerson ? 'on' : 'off'), '#9ab8ff'); } });
+  const pd0 = AH.Player.prototype.draw; AH.Player.prototype.draw = function () { if (fp() && Z.z > 1.5) return; return pd0.apply(this, arguments); };
 
   /* ---------------------------------------------------------------- hook into the post pass */
   const post0 = V.post;
@@ -164,7 +176,7 @@
   const SC = AH.UI && AH.UI.screens;
   if (SC && SC.settings) {
     const r0 = SC.settings.rows;
-    SC.settings.rows = function () { const a = r0.apply(this, arguments), s = S(), at = Math.max(0, a.length - 1); a.splice(at, 0, { k: 'chaseCam', label: 'Third-person camera (F9)', v: s.chaseCam, type: 'tog' }, { k: 'bloom', label: 'Bloom', v: s.bloom, type: 'tog' }, { k: 'shafts', label: 'Light shafts', v: s.shafts, type: 'tog' }); return a; };
+    SC.settings.rows = function () { const a = r0.apply(this, arguments), s = S(), at = Math.max(0, a.length - 1); a.splice(at, 0, { k: 'chaseCam', label: 'Third-person camera (F9)', v: s.chaseCam, type: 'tog' }, { k: 'firstPerson', label: 'First-person view (F10)', v: s.firstPerson, type: 'tog' }, { k: 'bloom', label: 'Bloom', v: s.bloom, type: 'tog' }, { k: 'shafts', label: 'Light shafts', v: s.shafts, type: 'tog' }); return a; };
     const d0 = SC.settings.draw;
     SC.settings.draw = function () { return d0.apply(this, arguments); };
   }
