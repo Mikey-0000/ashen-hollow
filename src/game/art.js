@@ -233,11 +233,29 @@
     g.putImageData(id, 0, 0); return P;
   }
 
+  /* chibi proportions: head +2 rows tall, +1 col wide; torso -2 rows so stature is unchanged */
+  function chibi(P) {
+    const src = P.c, W = 18, H = 30, c = U.makeCanvas(W, H), g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    const dupRows = [5, 8], cutRows = [14, 17]; let y2 = 0;
+    for (let y = 0; y < H; y++) {
+      if (cutRows.includes(y)) continue;
+      const put = (dy) => {
+        if (dy >= H) return;
+        if (y <= 11) { g.drawImage(src, 0, y, 9, 1, 0, dy, 9, 1); g.drawImage(src, 8, y, 10, 1, 9, dy, 9, 1); }
+        else g.drawImage(src, 0, y, W, 1, 0, dy, W, 1);
+      };
+      put(y2++);
+      if (dupRows.includes(y)) put(y2++);
+    }
+    P.g.clearRect(0, 0, W, H); P.g.drawImage(c, 0, 0);
+  }
+
   function build(spec) {
     const out = { down: [], up: [], side: [] };
     ['down', 'up', 'side'].forEach((d, di) => {
       for (let f = 0; f < 3; f++) {
         const P = figure(spec, di, f);
+        if (!spec.noChibi) chibi(P);
         if (spec.float) ghostify(P, f);
         const spr = S.fromCanvas(restack(P.c, spec.stretch | 0), 9, 32);
         S.outline(spr, spec.outline);
