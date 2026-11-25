@@ -3,5 +3,5 @@
 <script>
 const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
 let y=6;const A=AH.Art;
-['hero','marta','vesna','aldric','wren','hexcaller'].forEach(n=>{const set=n==='hero'?A.hero:A.npc[n];let x=6;['down','up','side'].forEach(d=>set[d].forEach(s=>{g.drawImage(s.c,x,y,s.w*5,s.h*5);x+=s.w*5+6;}));y+=150;});
+['hero','marta','vesna','aldric','wren','hexcaller'].forEach(n=>{const set=n==='hero'?A.hero:A.npc[n];let x=6;['down','up','side'].forEach(d=>set[d].forEach(s=>{g.drawImage(s.c,x,y,s.w*4,s.h*4);x+=s.w*4+6;}));y+=140;});
 </script></body></html>

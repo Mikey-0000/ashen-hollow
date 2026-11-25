@@ -45,7 +45,7 @@
       });
       /* coat / robe */
       if (hem) for (let y = 18; y <= hem; y++) {
-        const x0 = y < 19 ? 6 : y < 21 ? 5 : s.len === 'long' && y >= 23 ? 3 : 4;
+        const x0 = (y < 19 ? 6 : y < 21 ? 5 : s.len === 'long' && y >= 23 ? 3 : 4) - (y >= 19 ? (s.wide | 0) : 0);
         span(y, x0, 17 - x0, body);
         if (y >= 19 && s.len !== 'short') px(9, y, body[2]);
         if (y === hem && s.trim) span(y, x0, 17 - x0, s.trim);
@@ -67,6 +67,7 @@
       if (s.scarf) { span(11, 6, 11, s.scarf); span(12, 6, 11, s.scarf); if (s.scarfTail) { for (let y = 13; y <= 19; y++) { px(11, y, s.scarf[1]); px(12, y, s.scarf[2]); } px(11, 20, s.scarf[2]); } }
       else { span(11, 7, 10, skin); }
       /* head */
+      extras(0);
       head(0);
     } else if (dir === 1) {
       /* back */
@@ -76,7 +77,7 @@
         span(base - 1, Math.min(L[0], L[2]), Math.max(L[1], L[2]), s.boots); span(base, Math.min(L[0], L[2]), Math.max(L[1], L[2]), [s.boots[1], s.boots[2], s.boots[2]]);
       });
       if (hem) for (let y = 18; y <= hem; y++) {
-        const x0 = y < 19 ? 6 : y < 21 ? 5 : s.len === 'long' && y >= 23 ? 3 : 4;
+        const x0 = (y < 19 ? 6 : y < 21 ? 5 : s.len === 'long' && y >= 23 ? 3 : 4) - (y >= 19 ? (s.wide | 0) : 0);
         span(y, x0, 17 - x0, body); if (y === hem && s.trim) span(y, x0, 17 - x0, s.trim);
       }
       for (let y = 12; y <= 17; y++) span(y, 6, 11, body);
@@ -86,6 +87,7 @@
         for (let y = 14; y <= (s.capeLen || hem); y += 3) { px(8, y, s.cape[2]); px(9, y + 1, s.cape[2]); } if (s.trim) span((s.capeLen || hem) + 1, 3, 14, s.trim); }
       if (s.style === 'long') { for (let y = 9; y <= (s.hairLen || 17); y++) span(y, y > 14 ? 6 : 5, y > 14 ? 11 : 12, hair); }
       if (s.scarf) { span(11, 6, 11, s.scarf); span(12, 6, 11, s.scarf); if (s.scarfTail) { for (let y = 13; y <= 20; y++) { px(6, y, s.scarf[1]); px(5, y, s.scarf[0]); } } }
+      extras(1);
       head(1);
     } else {
       /* side, facing right */
@@ -117,7 +119,38 @@
       const fx = 9 + sw * 2; P.limb(9, 13, fx, 19, 2, 2, body[1]); px(9, 13, body[0]); px(10, 13, body[0]); px(fx, 20, skin[1]); px(fx + 1, 20, skin[0]);
       if (s.scarf) { span(11, 7, 11, s.scarf); span(12, 7, 11, s.scarf); if (s.scarfTail) { const fl = Math.round(Math.sin(f * 2.1) * 1); for (let i = 0; i < 6; i++) { px(6 - i + fl * (i > 2 ? 1 : 0), 12 + (i >> 1), s.scarf[i % 2 ? 2 : 1]); px(6 - i + fl * (i > 2 ? 1 : 0), 13 + (i >> 1), s.scarf[2]); } } }
       else span(11, 8, 10, skin);
+      extras(2);
       head(2);
+    }
+
+
+    /* ------------------------------------------------ per-type features: what makes each kind of person read differently */
+    function extras(d) {
+      if (s.shawl) {
+        const rows = d === 2 ? [[12, 7, 11], [13, 7, 10], [14, 7, 9], [15, 7, 8]] : [[12, 4, 13], [13, 5, 12], [14, 6, 11], [15, 7, 10], [16, 8, 9]];
+        rows.forEach((r) => span(r[0], r[1], r[2], s.shawl));
+        if (d === 0) { px(8, 17, s.shawl[2]); px(9, 17, s.shawl[2]); }
+      }
+      if (s.pauldron) {
+        if (d === 0) { span(11, 4, 7, s.pauldron); span(12, 4, 6, s.pauldron); px(4, 13, s.pauldron[2]); px(5, 11, s.pauldron[0]); }
+        else if (d === 1) { span(11, 10, 13, s.pauldron); span(12, 11, 13, s.pauldron); px(13, 13, s.pauldron[2]); }
+        else { span(11, 8, 11, s.pauldron); span(12, 8, 10, s.pauldron); px(8, 11, s.pauldron[0]); }
+      }
+      if (s.clasp && d === 0) {
+        span(16, 5, 12, s.cuff || body); span(17, 6, 11, body); px(8, 17, skin[1]); px(9, 17, skin[2]); px(8, 18, skin[2]); px(9, 18, skin[2]);
+      }
+      if (s.bell && d !== 2) {
+        [[3, sw, 1], [14, -sw, -1]].forEach((A) => { for (let y = 17; y <= 20; y++) px(A[0], y + A[1], y > 19 ? (s.trim || body)[1] : body[A[2] > 0 ? 0 : 2]); });
+        if (s.trim) { span(20 + sw, 3, 5, s.trim); span(20 - sw, 12, 14, s.trim); }
+      }
+      if (s.staff) {
+        const x = d === 1 ? 3 : d === 2 ? 13 : 14;
+        for (let y = 9; y <= 26; y++) px(x, y, s.staff[y % 6 === 0 ? 0 : y % 6 === 3 ? 2 : 1]);
+        px(x - 1, 8, s.staff[0]); px(x, 8, s.staff[0]); px(x, 7, s.staff[1]); px(x + 1, 8, s.staff[2]);
+      }
+      if (s.tatter) {
+        for (let x = 2; x <= 15; x++) { const cut = (x * 5 + (d ? 1 : 0)) % 3; P.g.clearRect(x, hem - cut + 1, 1, cut); }
+      }
     }
 
     /* ---------------------------------------------------- head, drawn last per direction */
@@ -196,23 +229,21 @@
       for (let f = 0; f < 3; f++) {
         const P = figure(spec, di, f);
         if (spec.float) ghostify(P, f);
-        let cv = P.c;
-        if (spec.child) cv = childify(cv, spec.child);
-        const spr = S.fromCanvas(cv, 9, 28);
+        const spr = S.fromCanvas(restack(P.c, spec.stretch | 0), 9, 32);
         S.outline(spr, spec.outline);
         out[d].push(spr);
       }
     });
     return out;
   }
-  /* children: drop `n` rows out of the torso (rows 14..) and slide everything above down */
-  function childify(src, n) {
-    const c = U.makeCanvas(18, 30), g = c.getContext('2d');
-    g.imageSmoothingEnabled = false;
-    g.drawImage(src, 0, 14, 18, 16, 0, 14, 18, 16); /* lower body stays on the ground */
-    g.clearRect(0, 0, 18, 14 + n);
-    g.drawImage(src, 0, 0, 18, 14, 0, n, 18, 14); /* head + shoulders slide down */
-    g.drawImage(src, 0, 14 + n, 18, 16 - n, 0, 14 + n, 18, 16 - n);
+  /* body height: add (n > 0) or remove (n < 0) torso rows so each type has its own stature; feet stay on the ground */
+  function restack(src, n) {
+    const c = U.makeCanvas(18, 34), g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    const top = 4 - n;
+    g.drawImage(src, 0, 0, 18, 16, 0, top, 18, 16);
+    for (let i = 0; i < n; i++) g.drawImage(src, 0, 15, 18, 1, 0, top + 16 + i, 18, 1);
+    if (n < 0) g.clearRect(0, 20, 18, -n);
+    g.drawImage(src, 0, 16, 18, 14, 0, 20, 18, 14);
     return c;
   }
 
@@ -220,28 +251,32 @@
   const HERO = {
     skin: SKIN.fair, hair: ['#f0eef6', '#bab8cc', '#7c7a94'], style: 'short', eyes: '#17121a', eyeGlow: '#6ad0ff',
     cloth: ['#4a7088', '#2f4c60', '#1c2f3d'], len: 'coat', trim: ['#6a5a3a', '#4a3e28', '#33291a'], under: '#d8cdb8', pants: ['#3a3440', '#2a2630', '#1c1a22'], boots: ['#5a4636', '#3a2c22', '#241a14'],
-    cape: ['#34406a', '#262f52', '#181d38'], capeLen: 23, scarf: ['#ffc060', '#e8962e', '#9a5a18'], scarfTail: true, belt: ['#6a4a30', '#4a3222', '#2e1e14'], buckle: '#f0c860', pouch: ['#7a5a38', '#5a4028', '#3a281a'], cuff: ['#8a6a40', '#6a5030', '#4a3620'],
+    cape: ['#34406a', '#262f52', '#181d38'], capeLen: 23, pauldron: ['#9a9fac', '#666b78', '#3e424e'], scarf: ['#ffc060', '#e8962e', '#9a5a18'], scarfTail: true, belt: ['#6a4a30', '#4a3222', '#2e1e14'], buckle: '#f0c860', pouch: ['#7a5a38', '#5a4028', '#3a281a'], cuff: ['#8a6a40', '#6a5030', '#4a3620'],
   };
   Art.hero = build(HERO);
   Art.heroSpec = HERO;
   Art.npc.marta = build({
+    stretch: -2, wide: 1, shawl: ['#5e8070', '#46634f', '#2f4638'], staff: ['#b08a5e', '#7e5c3a', '#4c3622'],
     skin: SKIN.warm, hair: ['#f0ece4', '#c4c0b4', '#868278'], style: 'bun', cloth: ['#9a6e84', '#75546a', '#4c3547'], len: 'long', trim: ['#6a5a3a', '#4a3e28', '#33291a'], pants: ['#3a2a30', '#2a1e24', '#1c1418'], boots: ['#4a3a30', '#32261e', '#20170f'],
     apron: ['#e0d4b4', '#c4b894', '#8c8268'], belt: ['#6a4a30', '#4a3222', '#2e1e14'], buckle: '#c8a850', under: '#d8cdb8', scarf: ['#7a8a5a', '#5a6a40', '#3a4a2a'], cuff: ['#d8cdb8', '#b8ad94', '#847a66'], eyes: '#2a1a1a',
   });
   Art.npc.vesna = build({
+    stretch: 3, wide: 1, bell: true,
     skin: SKIN.pale, hair: ['#6a5488', '#3c2c54', '#22183a'], style: 'long', hairLen: 19, hat: ['#5a4482', '#3a2a5c', '#1f1634'], hatBand: ['#e8c460', '#b89038', '#7a5c20'],
     cloth: ['#7a58a4', '#58407e', '#3a2858'], len: 'long', trim: ['#e8c460', '#b89038', '#7a5c20'], pants: ['#2a2038', '#1c1428', '#120c1c'], boots: ['#3a2a48', '#281c34', '#1a1222'],
     scarf: ['#58c8a0', '#34987a', '#1e6450'], scarfTail: true, belt: ['#5a4030', '#3e2c20', '#281c14'], buckle: '#e8c460', eyes: '#e8b8ff', eyeGlow: '#b070ff', cuff: ['#e8c460', '#b89038', '#7a5c20'],
   });
   Art.npc.aldric = build({
+    stretch: 2, clasp: true,
     skin: tones('#eef6fc'), hair: ['#f4f8fc', '#d0deea', '#98aec2'], style: 'hood', hood: ['#9db2c8', '#7890aa', '#52687f'], cloth: ['#c8d8e8', '#9fb4c8', '#6f869c'], len: 'long', trim: ['#e8f2fa', '#b8cadb', '#8aa2b8'],
     pants: ['#9fb4c8', '#8aa0b4', '#6f869c'], boots: ['#9fb4c8', '#8aa0b4', '#6f869c'], belt: ['#8aa2b8', '#6f869c', '#566c82'], buckle: '#f4f8fc', eyes: '#2a4058', cuff: ['#e8f2fa', '#b8cadb', '#8aa2b8'], float: true, outline: '#3a4a60',
   });
   Art.npc.wren = build({
     skin: SKIN.fair, hair: ['#f8e4a8', '#dcb870', '#a88444'], style: 'braid', cloth: ['#c25a56', '#9a3e3e', '#662828'], len: 'short', trim: ['#e0c890', '#b89c60', '#806c3c'], pants: ['#5a4030', '#3e2c20', '#281c14'], boots: ['#4a3a30', '#32261e', '#20170f'],
-    belt: ['#e0c890', '#b89c60', '#806c3c'], buckle: '#f0e0a0', bigEyes: true, eyes: '#2a1a1a', cape: ['#9a3e3e', '#7a2c2c', '#521c1c'], capeLen: 20, child: 4,
+    belt: ['#e0c890', '#b89c60', '#806c3c'], buckle: '#f0e0a0', bigEyes: true, eyes: '#2a1a1a', cape: ['#9a3e3e', '#7a2c2c', '#521c1c'], capeLen: 20, stretch: -4,
   });
   Art.npc.hexcaller = build({
+    stretch: 2, bell: true, tatter: true,
     skin: SKIN.bone, mask: ['#f0e8d8', '#cfc6b2', '#8e846e'], style: 'hood', hood: ['#8a2c40', '#5e1c2c', '#38101a'], horns: ['#e8e0cc', '#b8ae96', '#7c735e'], eyes: '#ff4a3a', eyeGlow: '#7a1010',
     cloth: ['#8a2c40', '#5e1c2c', '#38101a'], len: 'long', trim: ['#d8b050', '#a88030', '#6c5018'], pants: ['#20101a', '#180c14', '#10080c'], boots: ['#20181c', '#181014', '#100a0c'], belt: ['#d8b050', '#a88030', '#6c5018'], buckle: '#ffe090', cape: ['#5e1c2c', '#451420', '#2c0c14'], capeLen: 24, cuff: ['#d8b050', '#a88030', '#6c5018'],
   });
