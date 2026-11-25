@@ -118,4 +118,35 @@
     return { c, w: SW / 2, h: SH / 2, ax: 24, ay: 52, hi: true, _sil: {}, _flip: null };
   }
   Art.stag = { walk: [stag('walk1'), stag('stand'), stag('walk2'), stag('stand')], stand: stag('stand'), paw: stag('paw') };
+  /* ---- wisp, wraith, crow ---- */
+  function finish(R, ax, ay, oc) { outline(R, oc); const c = U.makeCanvas(R.CW, R.CH), g = c.getContext('2d'); g.putImageData(new ImageData(R.d, R.CW, R.CH), 0, 0); return { c, w: R.CW / 2, h: R.CH / 2, ax: ax / 2, ay: ay / 2, hi: true, _sil: {}, _flip: null }; }
+  function wisp(i) {
+    const R = raster(32, 44), ph = (i / 6) * Math.PI * 2;
+    for (let y = 6; y < 42; y++) {
+      const t = (y - 6) / 36, w = y < 20 ? 3 + (y - 6) * 0.62 : 11.7 * (1 - (y - 20) / 22) + 0.5, sw = Math.sin(ph + y * 0.35) * (1 + t * 3.2) * (y > 20 ? 1 : 0.3);
+      for (let x = -w; x <= w; x++) { const nx = Math.abs(x) / Math.max(1, w), c = nx < 0.35 && y < 30 ? '#e8fff6' : nx < 0.65 ? '#8af0d0' : nx < 0.9 ? '#3cc0a0' : '#1e7a6a'; R.set(16 + x + sw, y + (y < 12 ? 0 : 0), c); }
+    }
+    R.set(16 + Math.sin(ph) * 1.5, 4, '#8af0d0'); R.set(16, 3, '#e8fff6');
+    R.rect(10, 17, 4, 5, '#0c3a34'); R.rect(18, 17, 4, 5, '#0c3a34'); R.rect(11, 18, 2, 2, '#e8fff6'); R.rect(19, 18, 2, 2, '#e8fff6'); R.rect(14, 26, 4, 3, '#0c3a34');
+    return finish(R, 16, 28, '#0e4a44');
+  }
+  function wraith(i) {
+    const R = raster(32, 48), ph = (i / 4) * Math.PI * 2;
+    for (let y = 16; y < 44; y++) { const t = (y - 16) / 28, w = 7.5 - t * 4.2 + Math.sin(ph + y * 0.4) * 0.8, sw = Math.sin(ph + y * 0.5) * 3.2 * t;
+      for (let x = -w; x <= w; x++) { const nx = x / w, l = -nx * 0.7, c = l > 0.35 ? '#d6e4f4' : l > -0.3 ? '#a6bcd8' : '#6f86a8'; if (t > 0.75 && (Math.round(x + y) % 3 === 0)) continue; R.set(16 + x + sw, y, c); } }
+    R.limb(10, 22, 5, 36 + Math.sin(ph) * 2, 3, ['#d6e4f4', '#a6bcd8', '#6f86a8']); R.limb(22, 22, 27, 36 - Math.sin(ph) * 2, 3, ['#d6e4f4', '#a6bcd8', '#6f86a8']);
+    R.ell(16, 13, 8.6, 9.4, ['#f2f8ff', '#c4d6ea', '#8aa0bc'], 0.15);
+    R.rect(10, 11, 4, 5, '#1a2236'); R.rect(18, 11, 4, 5, '#1a2236'); R.rect(11, 12, 2, 2, '#9ad0ff'); R.rect(19, 12, 2, 2, '#9ad0ff'); R.rect(14, 19, 4, 4, '#1a2236');
+    return finish(R, 16, 40, '#2a3a58');
+  }
+  function crow(pose) {
+    const R = raster(28, 24), B = ['#4a4a60', '#2a2a38', '#14141c'];
+    if (pose === 'idle') { R.ell(13, 13, 9, 5.6, B, -0.15); R.ell(21, 9, 4.4, 4, B); R.limb(23, 10, 28, 12, 3, ['#8a8a96', '#5a5a66', '#3a3a44']); R.set(22, 8, '#ffd060'); R.limb(6, 15, 0, 18, 3, B); R.limb(11, 18, 11, 22, 1, ['#3a3a44', '#3a3a44', '#3a3a44']); R.limb(15, 18, 15, 22, 1, ['#3a3a44', '#3a3a44', '#3a3a44']); }
+    else { const up = pose === 'fly1'; R.ell(13, 13, 8, 4.6, B, -0.1); R.ell(21, 11, 4, 3.6, B); R.limb(23, 12, 27, 13, 3, ['#8a8a96', '#5a5a66', '#3a3a44']); R.set(22, 10, '#ffd060'); R.limb(6, 14, 1, 16, 3, B);
+      R.limb(12, 11, up ? 6 : 6, up ? 1 : 20, 4, B); R.limb(6, up ? 1 : 20, up ? 1 : 2, up ? 3 : 22, 3, B); R.limb(15, 11, up ? 19 : 19, up ? 1 : 20, 4, B); R.limb(19, up ? 1 : 20, up ? 25 : 25, up ? 4 : 22, 3, B); }
+    return finish(R, 12, 22, '#08080e');
+  }
+  Art.wisp = [0, 1, 2, 3, 4, 5].map(wisp);
+  Art.wraith = [0, 1, 2, 3].map(wraith);
+  Art.crow = { idle: crow('idle'), fly: [crow('fly1'), crow('fly2')] };
 })();
