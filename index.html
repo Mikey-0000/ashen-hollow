@@ -106,10 +106,54 @@
   #gate .small { margin-top: 16px; font-size: 11.5px; letter-spacing: .12em; color: var(--dim); }
   #gate .small a { color: var(--gold); cursor: pointer; text-decoration: underline dotted; }
   @media (max-height: 640px) { .brand small { display: none; } header { padding-top: 6px; } .frame { width: min(100%, calc((100vh - 120px) * 16 / 9)); } footer { padding-top: 4px; } }
+
+  /* ---- shell flourishes ---- */
+  @property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  body { background:
+    radial-gradient(1200px 700px at 50% 38%, color-mix(in srgb, var(--amb, #1c1424) 22%, #1c1424) 0%, #0b0810 55%, #040306 100%); }
+  .fog { position: fixed; inset: -10%; pointer-events: none; z-index: 0; opacity: .55; mix-blend-mode: screen;
+    background: radial-gradient(40% 30% at 20% 70%, rgba(90,70,130,.16), transparent 70%), radial-gradient(35% 28% at 78% 30%, rgba(60,110,120,.12), transparent 70%), radial-gradient(45% 25% at 50% 95%, rgba(150,80,50,.14), transparent 70%);
+    animation: drift 38s ease-in-out infinite alternate; }
+  .fog.b { opacity: .4; animation-duration: 55s; animation-direction: alternate-reverse; transform: scaleX(-1); }
+  @keyframes drift { from { transform: translate3d(-3%, 1%, 0) scale(1.05); } to { transform: translate3d(3%, -2%, 0) scale(1.15); } }
+  .wheel { position: fixed; left: 50%; top: 46%; width: min(120vh, 120vw); aspect-ratio: 1; translate: -50% -50%; pointer-events: none; z-index: 0; opacity: .13; animation: spin 240s linear infinite; }
+  .wheel.r { width: min(88vh, 88vw); opacity: .10; animation-duration: 160s; animation-direction: reverse; }
+  @keyframes spin { to { rotate: 360deg; } }
+  .brand h1 { background: linear-gradient(100deg, #8a6a34 0%, #e8cf8a 18%, #c9a45c 34%, #8a6a34 52%, #f3e2a8 70%, #c9a45c 88%); background-size: 240% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 14px rgba(201,164,92,.35)); animation: sheen 9s linear infinite; }
+  #gate .big { background: linear-gradient(100deg, #8a6a34 0%, #f3e2a8 25%, #c9a45c 45%, #8a6a34 60%, #f3e2a8 80%, #c9a45c 100%); background-size: 250% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(0 3px 0 #000) drop-shadow(0 0 30px rgba(255,154,60,.35)); animation: flick 6s infinite, sheen 10s linear infinite; }
+  @keyframes sheen { to { background-position: -240% 0; } }
+  .frame { --amb: #ff9a3c; box-shadow: 0 0 0 2px #0a0810, 0 0 0 4px var(--gold2), 0 0 0 6px #0a0810, 0 0 0 7px #4a3a22,
+    0 0 70px 14px color-mix(in srgb, var(--amb) 34%, transparent), 0 0 160px 40px color-mix(in srgb, var(--amb) 14%, transparent), 0 30px 80px rgba(0,0,0,.9); transition: box-shadow .6s ease; }
+  .frame .edge { position: absolute; inset: -8px; pointer-events: none; z-index: 2; padding: 1.5px;
+    background: conic-gradient(from var(--ang), transparent 0 62%, rgba(255,190,100,.0) 66%, rgba(255,200,120,.95) 74%, rgba(255,154,60,0) 82%, transparent 84% 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: orbit 7s linear infinite; filter: drop-shadow(0 0 4px rgba(255,170,80,.8)); }
+  @keyframes orbit { to { --ang: 360deg; } }
+  button.rune::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255,230,170,.35) 50%, transparent 65%); transform: translateX(-120%); pointer-events: none; }
+  button.rune:hover::after, button.rune:focus-visible::after { transform: translateX(120%); transition: transform .6s ease; }
+  button.rune:hover { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 18px rgba(255,154,60,.35); }
+  button.rune:active { transform: translateY(1px) scale(.98); }
+  #gate button.rune { animation: beckon 3.2s ease-in-out infinite; }
+  @keyframes beckon { 50% { filter: drop-shadow(0 0 12px rgba(255,154,60,.55)); } }
+  kbd { transition: background .08s, color .08s, box-shadow .08s, transform .08s; }
+  kbd.down { background: var(--gold); color: #120e16; border-color: #fff0b0; box-shadow: 0 0 12px rgba(255,200,110,.9); transform: translateY(1px); }
+  .keys b { transition: color .15s; } .keys span:hover b { color: var(--gold); }
+  .veil .book { animation: rise .35s cubic-bezier(.2,.9,.3,1); }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.985); } }
+  .card { transition: transform .15s, box-shadow .15s; } .card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.5), 0 0 22px color-mix(in srgb, var(--c, #8a6a34) 30%, transparent); }
+  @media (prefers-reduced-motion: reduce) { .fog, .wheel, .frame .edge, .brand h1, #gate .big, #gate button.rune { animation: none !important; } }
 </style>
 </head>
 <body>
 <canvas id="embers"></canvas>
+<svg class="wheel" viewBox="-100 -100 200 200" aria-hidden="true"><g fill="none" stroke="#c9a45c" stroke-width=".35">
+  <circle r="98"/><circle r="94" stroke-dasharray="1 2.2"/><circle r="78"/><circle r="60" stroke-dasharray="6 3"/>
+  <path d="M0-98L84.9 49 -84.9 49Z"/><path d="M0 98L84.9-49 -84.9-49Z"/>
+  <g stroke-width=".5"><path d="M0-98v8M0 98v-8M-98 0h8M98 0h-8M-69-69l5.6 5.6M69 69l-5.6-5.6M69-69l-5.6 5.6M-69 69l5.6-5.6"/></g></g></svg>
+<svg class="wheel r" viewBox="-100 -100 200 200" aria-hidden="true"><g fill="none" stroke="#7fe0c0" stroke-width=".3">
+  <circle r="96"/><circle r="70" stroke-dasharray="2 4"/><circle r="44"/><path d="M0-96L83 48M0-96L-83 48M-83 48H83"/><path d="M0 96L83-48M0 96L-83-48M-83-48H83"/></g></svg>
+<div class="fog"></div><div class="fog b"></div>
 
 <header>
   <div class="brand">
@@ -131,7 +175,7 @@
 
 <main>
   <div class="frame">
-    <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+    <div class="edge"></div><div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
     <div id="stage"><canvas id="screen" width="480" height="270" tabindex="0" aria-label="Ashen Hollow game screen"></canvas></div>
   </div>
 </main>
@@ -322,52 +366,53 @@
 </div>
 
 <script>window.AH = { };</script>
-<script src="src/core/util.js?v=20261125p"></script>
-<script src="src/core/font.js?v=20261125p"></script>
-<script src="src/core/input.js?v=20261125p"></script>
-<script src="src/core/audio.js?v=20261125p"></script>
-<script src="src/core/sprites.js?v=20261125p"></script>
-<script src="src/core/hires.js?v=20261125p"></script>
-<script src="src/core/particles.js?v=20261125p"></script>
-<script src="src/core/lighting.js?v=20261125p"></script>
-<script src="src/core/present.js?v=20261125p"></script>
-<script src="src/core/weather.js?v=20261125p"></script>
-<script src="src/game/art.js?v=20261125p"></script>
-<script src="src/game/art2.js?v=20261125p"></script>
-<script src="src/game/art3.js?v=20261125p"></script>
-<script src="src/game/tiles.js?v=20261125p"></script>
-<script src="src/game/props.js?v=20261125p"></script>
-<script src="src/data/icons.js?v=20261125p"></script>
-<script src="src/data/items.js?v=20261125p"></script>
-<script src="src/data/spells.js?v=20261125p"></script>
-<script src="src/data/skills.js?v=20261125p"></script>
-<script src="src/data/lore.js?v=20261125p"></script>
-<script src="src/data/arsenal.js?v=20261125p"></script>
-<script src="src/data/enemies.js?v=20261125p"></script>
-<script src="src/data/maps.js?v=20261125p"></script>
-<script src="src/game/clutter.js?v=20261125p"></script>
-<script src="src/data/dialogue.js?v=20261125p"></script>
-<script src="src/game/combat.js?v=20261125p"></script>
-<script src="src/game/state.js?v=20261125p"></script>
-<script src="src/game/player.js?v=20261125p"></script>
-<script src="src/game/enemy.js?v=20261125p"></script>
-<script src="src/game/boss.js?v=20261125p"></script>
-<script src="src/game/magic.js?v=20261125p"></script>
-<script src="src/game/elements.js?v=20261125p"></script>
-<script src="src/game/objects.js?v=20261125p"></script>
-<script src="src/game/life.js?v=20261125p"></script>
-<script src="src/game/world.js?v=20261125p"></script>
-<script src="src/game/living.js?v=20261125p"></script>
-<script src="src/game/vfx.js?v=20261125p"></script>
-<script src="src/game/ambience.js?v=20261125p"></script>
-<script src="src/ui/skin.js?v=20261125p"></script>
-<script src="src/ui/hud.js?v=20261125p"></script>
-<script src="src/ui/screens.js?v=20261125p"></script>
-<script src="src/game/polish.js?v=20261125p"></script>
-<script src="src/ui/mouse.js?v=20261125p"></script>
-<script src="src/game/journal.js?v=20261125p"></script>
-<script src="src/game/cheats.js?v=20261125p"></script>
-<script src="src/main.js?v=20261125p"></script>
-<script src="src/shell.js?v=20261125p"></script>
+<script src="src/core/util.js?v=20261125q"></script>
+<script src="src/core/font.js?v=20261125q"></script>
+<script src="src/core/input.js?v=20261125q"></script>
+<script src="src/core/audio.js?v=20261125q"></script>
+<script src="src/core/sprites.js?v=20261125q"></script>
+<script src="src/core/hires.js?v=20261125q"></script>
+<script src="src/core/particles.js?v=20261125q"></script>
+<script src="src/core/lighting.js?v=20261125q"></script>
+<script src="src/core/present.js?v=20261125q"></script>
+<script src="src/core/weather.js?v=20261125q"></script>
+<script src="src/game/art.js?v=20261125q"></script>
+<script src="src/game/art2.js?v=20261125q"></script>
+<script src="src/game/art3.js?v=20261125q"></script>
+<script src="src/game/tiles.js?v=20261125q"></script>
+<script src="src/game/props.js?v=20261125q"></script>
+<script src="src/data/icons.js?v=20261125q"></script>
+<script src="src/data/items.js?v=20261125q"></script>
+<script src="src/data/spells.js?v=20261125q"></script>
+<script src="src/data/skills.js?v=20261125q"></script>
+<script src="src/data/lore.js?v=20261125q"></script>
+<script src="src/data/arsenal.js?v=20261125q"></script>
+<script src="src/data/enemies.js?v=20261125q"></script>
+<script src="src/data/maps.js?v=20261125q"></script>
+<script src="src/game/clutter.js?v=20261125q"></script>
+<script src="src/data/dialogue.js?v=20261125q"></script>
+<script src="src/game/combat.js?v=20261125q"></script>
+<script src="src/game/state.js?v=20261125q"></script>
+<script src="src/game/player.js?v=20261125q"></script>
+<script src="src/game/enemy.js?v=20261125q"></script>
+<script src="src/game/boss.js?v=20261125q"></script>
+<script src="src/game/magic.js?v=20261125q"></script>
+<script src="src/game/elements.js?v=20261125q"></script>
+<script src="src/game/objects.js?v=20261125q"></script>
+<script src="src/game/life.js?v=20261125q"></script>
+<script src="src/game/world.js?v=20261125q"></script>
+<script src="src/game/living.js?v=20261125q"></script>
+<script src="src/game/vfx.js?v=20261125q"></script>
+<script src="src/game/ambience.js?v=20261125q"></script>
+<script src="src/ui/skin.js?v=20261125q"></script>
+<script src="src/ui/hud.js?v=20261125q"></script>
+<script src="src/ui/screens.js?v=20261125q"></script>
+<script src="src/game/polish.js?v=20261125q"></script>
+<script src="src/ui/mouse.js?v=20261125q"></script>
+<script src="src/game/journal.js?v=20261125q"></script>
+<script src="src/game/cheats.js?v=20261125q"></script>
+<script src="src/main.js?v=20261125q"></script>
+<script src="src/shell.js?v=20261125q"></script>
+<script src="src/shellfx.js?v=20261125q"></script>
 </body>
 </html>
