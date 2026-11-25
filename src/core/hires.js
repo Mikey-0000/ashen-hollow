@@ -50,4 +50,21 @@
   Hi.mode = 'aa';
   Hi.of = function (c) { return c._hi || (c._hi = Hi.up(c, Hi.mode)); };
   Hi.sil = function (hc, color) { const k = '_s' + color; if (hc[k]) return hc[k]; const o = mk(hc.width, hc.height), g = o.getContext('2d'); g.drawImage(hc, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, o.width, o.height); return (hc[k] = o); };
+
+  /* extra hi-res ground detail, baked once into the smoothed ground: grass blades, dirt grit, leaf flecks. Deterministic. */
+  Hi.detail = function (hc, w, h, tiles) {
+    const ID = AH.Tiles.ID, g = hc.getContext('2d'), hash = AH.U.hash;
+    const blade = (x, y, c1, c2, len) => { g.fillStyle = c2; g.fillRect(x, y, 1, len); g.fillStyle = c1; g.fillRect(x, y, 1, 1); };
+    for (let ty = 0; ty < h; ty++) for (let tx = 0; tx < w; tx++) {
+      const id = tiles[ty * w + tx]; if (id !== ID.GRASS && id !== ID.MOSS && id !== ID.DIRT && id !== ID.LEAVES && id !== ID.MUD) continue;
+      const n = id === ID.GRASS || id === ID.MOSS ? 7 : 5;
+      for (let i = 0; i < n; i++) {
+        const x = tx * 32 + 1 + Math.floor(hash(tx * 7 + i, ty * 5, 91) * 30), y = ty * 32 + 1 + Math.floor(hash(tx * 3, ty * 11 + i, 92) * 28), r = hash(tx + i * 13, ty + i * 7, 93);
+        if (id === ID.GRASS || id === ID.MOSS) blade(x, y, r < 0.5 ? 'rgba(122,160,88,0.55)' : 'rgba(86,120,62,0.5)', 'rgba(18,30,16,0.4)', 2 + (r > 0.8 ? 1 : 0));
+        else if (id === ID.LEAVES) { g.fillStyle = r < 0.5 ? 'rgba(190,120,60,0.5)' : 'rgba(120,70,34,0.55)'; g.fillRect(x, y, 2, 1); g.fillRect(x + 1, y + 1, 1, 1); }
+        else { g.fillStyle = r < 0.5 ? 'rgba(150,126,98,0.45)' : 'rgba(30,22,16,0.4)'; g.fillRect(x, y, 2, 1); }
+      }
+    }
+    return hc;
+  };
 })();

@@ -139,7 +139,7 @@
   function bookSpells(dt, Gm) {
     const list = spellList(Gm); if (!list.length) return; if (I.repeat('up')) { B.sel = (B.sel + list.length - 1) % list.length; AH.Audio.sfx('ui_move'); } if (I.repeat('down')) { B.sel = (B.sel + 1) % list.length; AH.Audio.sfx('ui_move'); } B.sel = U.clamp(B.sel, 0, list.length - 1);
     const id = list[B.sel];
-    for (let i = 0; i < 4; i++) if (I.pressed('slot' + (i + 1))) { const ex = Gm.slots.indexOf(id); if (ex >= 0) Gm.slots[ex] = Gm.slots[i]; Gm.slots[i] = id; AH.Audio.sfx('ui_ok'); }
+    for (let i = 0; i < 8; i++) if (I.pressed('slot' + (i + 1))) { const ex = Gm.slots.indexOf(id); if (ex >= 0) Gm.slots[ex] = Gm.slots[i]; Gm.slots[i] = id; AH.Audio.sfx('ui_ok'); }
     if (I.pressed('interact') && !AH.Spells[id].forbidden || (I.pressed('confirm') && I.held('code:KeyE') === false && false)) { }
     if (I.pressed('confirm')) { const sp = AH.getSpell(id); if (sp.fused) return; if (sp.forbidden) { AH.Audio.sfx('ui_deny'); return; } if (!B.fuseA) { B.fuseA = id; AH.Audio.sfx('ui_ok'); Gm.toast('Choose a second spell to fuse (Enter), Esc to cancel.', '#e0c0f0'); } else if (B.fuseA !== id) { const r = Gm.fuse(B.fuseA, id); if (r === 'ash') Gm.toast('Fusion needs Soul Ash (dismissed thralls leave it).', '#b06a6a'); else if (!r) Gm.toast('Those cannot be fused.', '#b06a6a'); else AH.Audio.sfx('levelup'); B.fuseA = null; } else B.fuseA = null; }
     if (I.pressed('back') && B.fuseA) { B.fuseA = null; I.clearBack = true; }
@@ -151,7 +151,7 @@
     const sp = AH.getSpell(id), S = AH.Schools[sp.school]; g.drawImage(AH.Icons.of({ icon: sp.icon, scheme: sp.school }, sp.forbidden ? '#d04050' : null), x + 194, y + 14, 32, 32); Font.draw(g, sp.name, x + 232, y + 16, S.col); Font.draw(g, (sp.fused ? 'Fused - ' : '') + S.name + (sp.forbidden ? ' - FORBIDDEN' : ''), x + 232, y + 27, sp.forbidden ? '#d04050' : C.dim);
     const c = Gm.player.costOf(sp); Font.draw(g, 'Cost: ' + Object.keys(c).map((k) => (k === 'reagent' ? AH.Items[c[k]].name : k === 'hpTo' ? 'all but 1 vitality' : c[k] + ' ' + (k === 'hp' ? 'vitality' : k))).join(', '), x + 194, y + 52, '#e8c670'); let ly = y + 64; Font.wrap(sp.desc, 240).forEach((l) => { Font.draw(g, l, x + 194, ly, C.ink); ly += 10; }); ly += 4; Font.wrap(sp.hint, 240).forEach((l) => { Font.draw(g, l, x + 194, ly, '#9a8ec4'); ly += 10; });
     ly += 6; UI.divider(g, x + 194, ly, 242); ly += 8; Font.draw(g, 'Rule of ' + S.name + ':', x + 194, ly, S.col); ly += 10; Font.wrap(S.rule, 240).forEach((l) => { Font.draw(g, l, x + 194, ly, C.dim); ly += 10; });
-    Font.draw(g, '[1-4] assign slot   [Enter] fuse' + (B.fuseA ? ' (pick 2nd)' : ''), x + 315, y + 214, C.gold, { align: 'center' });
+    Font.draw(g, '[1-8] assign slot   [Enter] fuse' + (B.fuseA ? ' (pick 2nd)' : ''), x + 315, y + 214, C.gold, { align: 'center' });
   }
   /* ---- skills ---- */
   const BR = AH.SkillBranches;

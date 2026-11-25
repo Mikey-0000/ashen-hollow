@@ -18,6 +18,7 @@
       if (!this._allMagic) {
         this._allMagic = true; AH.SchoolOrder.forEach((s) => G.learnSchool(s, true));
         Object.values(AH.Spells).forEach((s) => { if (!G.spells.includes(s.id)) G.unlockSpell(s.id, true); });
+        G.slots = (G.slots || []).concat([null, null, null, null, null, null, null, null]).slice(0, 8); G.spells.forEach((id) => { if (!G.slots.includes(id)) { const f = G.slots.indexOf(null); if (f >= 0) G.slots[f] = id; } });
         G.toast('Unlimited magic: every school and spell is yours.', '#c8a0f0');
       }
       this.souls = this.soulMax(); this.verd = this.verdMax(); this.aether = this.aetherMax();

@@ -76,8 +76,8 @@
       }
       /* selection of spell slots */
       if (!uiBlocked) {
-        for (let i = 0; i < 4; i++) if (Input.pressed('slot' + (i + 1)) && G.slots[i]) { G.sel = i; AH.Audio.sfx('ui_move'); }
-        if (Input.pressed('prev') || Input.pressed('next')) { const d = Input.pressed('next') ? 1 : -1; for (let k = 1; k <= 4; k++) { const i = (G.sel + d * k + 8) % 4; if (G.slots[i]) { G.sel = i; AH.Audio.sfx('ui_move'); break; } } }
+        for (let i = 0; i < 8; i++) if (Input.pressed('slot' + (i + 1)) && G.slots[i]) { G.sel = i; AH.Audio.sfx('ui_move'); }
+        if (Input.pressed('prev') || Input.pressed('next')) { const d = Input.pressed('next') ? 1 : -1; for (let k = 1; k <= 8; k++) { const i = (G.sel + d * k + 16) % 8; if (G.slots[i]) { G.sel = i; AH.Audio.sfx('ui_move'); break; } } }
       }
       switch (this.state) {
         case 'move': this.stMove(dt, w, ax, moveLen, uiBlocked); break;

@@ -25,9 +25,10 @@
     if (p.status.bleed) { Font.draw(g, 'BLEEDING', x, ry, '#e05868'); ry += 9; }
     /* --- spell slots, bottom-left --- */
     const sy = H - 30;
-    for (let i = 0; i < 4; i++) {
-      const sx = 8 + i * 24, id = G.slots[i], sp = id && AH.getSpell(id), on = i === G.sel;
-      g.fillStyle = '#05040a'; g.fillRect(sx - 1, sy - 1, 22, 22); g.fillStyle = on ? C.gold : C.iron; g.fillRect(sx - 1, sy - 1, 22, 1); g.fillRect(sx - 1, sy + 20, 22, 1); g.fillRect(sx - 1, sy - 1, 1, 22); g.fillRect(sx + 20, sy - 1, 1, 22);
+    const rows2 = G.slots.slice(4, 8).some(Boolean);
+    for (let i = 0; i < (rows2 ? 8 : 4); i++) {
+      const sx = 8 + (i % 4) * 24, sy = H - 30 - Math.floor(i / 4) * 24, id = G.slots[i], sp = id && AH.getSpell(id), on = i === G.sel;
+      UI.hotr('slot', i, sx - 1, sy - 1, 22, 22); g.fillStyle = '#05040a'; g.fillRect(sx - 1, sy - 1, 22, 22); g.fillStyle = on ? C.gold : C.iron; g.fillRect(sx - 1, sy - 1, 22, 1); g.fillRect(sx - 1, sy + 20, 22, 1); g.fillRect(sx - 1, sy - 1, 1, 22); g.fillRect(sx + 20, sy - 1, 1, 22);
       if (sp) {
         const why = p.canPay(sp), cd = Math.max(0, p.cd[sp.id] || 0), cdk = sp.cd ? cd / sp.cd : 0; g.globalAlpha = why ? 0.4 : 1; g.drawImage(AH.Icons.of({ icon: sp.icon, scheme: sp.school }, sp.forbidden ? '#d04050' : null), sx + 2, sy + 2); g.globalAlpha = 1;
         if (cdk > 0) { g.fillStyle = 'rgba(5,4,10,0.7)'; g.fillRect(sx + 2, sy + 2 + Math.round(16 * (1 - cdk)), 16, Math.round(16 * cdk)); }
@@ -35,7 +36,7 @@
       }
       Font.draw(g, String(i + 1), sx + 2, sy + 12, on ? C.gold : C.dim, { outline: '#05040a', shadow: false });
     }
-    const cur = G.slots[G.sel] && AH.getSpell(G.slots[G.sel]); if (cur) { const c = p.costOf(cur); const cs = Object.keys(c).map((k) => (k === 'reagent' ? AH.Items[c[k]].name.split(' ')[0] : c[k] + ' ' + k)).join(' ') ; Font.draw(g, cur.name, 8, sy - 10, AH.Schools[cur.school].col, { outline: '#05040a' }); Font.draw(g, cs, 8 + Font.width(cur.name) + 6, sy - 10, C.dim, { outline: '#05040a' }); }
+    const cur = G.slots[G.sel] && AH.getSpell(G.slots[G.sel]); if (cur) { const c = p.costOf(cur); const cs = Object.keys(c).map((k) => (k === 'reagent' ? AH.Items[c[k]].name.split(' ')[0] : c[k] + ' ' + k)).join(' ') ; Font.draw(g, cur.name, 8, sy - 10 - (rows2 ? 24 : 0), AH.Schools[cur.school].col, { outline: '#05040a' }); Font.draw(g, cs, 8 + Font.width(cur.name) + 6, sy - 10 - (rows2 ? 24 : 0), C.dim, { outline: '#05040a' }); }
     /* --- clock & weather, top-right --- */
     const hr = G.hour, hh = Math.floor(hr), mm = Math.floor((hr - hh) * 60), day = AH.Lighting.daylight(hr), cx = W - 22, cy = 20;
     g.fillStyle = '#05040a'; g.fillRect(cx - 14, cy - 14, 28, 28); g.fillStyle = C.iron; g.fillRect(cx - 13, cy - 13, 26, 26); g.fillStyle = '#0e0c16'; g.fillRect(cx - 12, cy - 12, 24, 24);

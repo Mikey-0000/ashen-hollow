@@ -14,6 +14,10 @@
   window.addEventListener('mousemove', () => { moved = true; });
   window.addEventListener('mousedown', (e) => { if (e.button === 2 && menuCtx()) tap('back'); });
   window.addEventListener('wheel', (e) => { if (menuCtx() && Math.abs(e.deltaY) > 1) tap(e.deltaY > 0 ? 'down' : 'up'); }, { passive: true });
+  window.addEventListener('mousedown', (e) => {
+    const Gm = AH.G; if (e.button !== 0 || !Gm || Gm.mode !== 'play' || Gm.screen) return;
+    const h = UI.hit('slot'); if (h >= 0) { if (Gm.slots[h]) { Gm.sel = h; AH.Audio.sfx('ui_move'); } I.mouse.pressed = false; I.mouse.down = false; }
+  });
   const endFrame = I.endFrame; I.endFrame = function () { moved = false; endFrame.apply(this, arguments); };
 
   /* generic lists: UI.nav(n, ...) takes the hovered row; a click also confirms */

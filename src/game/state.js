@@ -7,7 +7,7 @@
   const DEFAULT_SETTINGS = { master: 0.7, music: 0.55, sfx: 0.8, shake: 1, hitstop: 1, particles: 1, reduceFlash: false, scale: 'fit', display: 'smooth', unlimitedSP: true, unlimitedMagic: true, resolution: 'auto', fullHud: true, showHints: true };
 
   const G = (AH.G = {
-    settings: Object.assign({}, DEFAULT_SETTINGS), flags: {}, inv: {}, equip: { weapon: 'sickle_rust', cloak: 'mantle_pilgrim', relic1: null, relic2: null }, spells: [], slots: [null, null, null, null], sel: 0,
+    settings: Object.assign({}, DEFAULT_SETTINGS), flags: {}, inv: {}, equip: { weapon: 'sickle_rust', cloak: 'mantle_pilgrim', relic1: null, relic2: null }, spells: [], slots: [null, null, null, null, null, null, null, null], sel: 0,
     skills: {}, skillPoints: 0, xp: 0, level: 1, fusions: [], waystones: {}, lore: {}, choices: [], seen: {}, kills: 0, toasts: [], hour: 17.5, day: 1, clock: 0, slowmo: 0, hitstop: 0, areaState: {}, visited: {}, chestOpened: {},
     mode: 'title', world: null, player: null, fade: { a: 0, dir: 0, cb: null }, origin: null, playtime: 0, deaths: 0, lastWaystone: null, area: 'hamlet', screen: null, dialogue: null, prompt: null, dayMarks: {},
   });
@@ -119,10 +119,10 @@
 
   /* ---------- new game / save / load ---------- */
   G.newGame = (originId) => {
-    const st = AH.Starts[originId]; Object.assign(G, { flags: {}, inv: {}, equip: { weapon: 'sickle_rust', cloak: 'mantle_pilgrim', relic1: null, relic2: null }, spells: [], slots: [null, null, null, null], sel: 0, skills: {}, skillPoints: 0, xp: 0, level: 1, fusions: [], waystones: {}, lore: {}, choices: [], seen: {}, kills: 0, toasts: [], hour: 17.5, day: 1, clock: 0, areaState: {}, visited: {}, playtime: 0, deaths: 0, origin: originId, lastWaystone: { area: 'hamlet', spawn: 'start' }, slowmo: 0, hitstop: 0, dayMarks: {} });
+    const st = AH.Starts[originId]; Object.assign(G, { flags: {}, inv: {}, equip: { weapon: 'sickle_rust', cloak: 'mantle_pilgrim', relic1: null, relic2: null }, spells: [], slots: [null, null, null, null, null, null, null, null], sel: 0, skills: {}, skillPoints: 0, xp: 0, level: 1, fusions: [], waystones: {}, lore: {}, choices: [], seen: {}, kills: 0, toasts: [], hour: 17.5, day: 1, clock: 0, areaState: {}, visited: {}, playtime: 0, deaths: 0, origin: originId, lastWaystone: { area: 'hamlet', spawn: 'start' }, slowmo: 0, hitstop: 0, dayMarks: {} });
     G.inv.sickle_rust = 1; G.inv.mantle_pilgrim = 1; Object.keys(st.items).forEach((k) => (G.inv[k] = st.items[k]));
     G.player = new AH.Player(G); G.player.hp = st.hp; G.player.corruption = 0;
-    G.learnSchool(st.school, true); if (!G.spells.length || G.spells[0] !== st.spell) { G.spells = G.spells.filter((s) => s !== st.spell); G.spells.unshift(st.spell); G.slots = [null, null, null, null]; G.spells.slice(0, 4).forEach((s, i) => (G.slots[i] = s)); }
+    G.learnSchool(st.school, true); if (!G.spells.length || G.spells[0] !== st.spell) { G.spells = G.spells.filter((s) => s !== st.spell); G.spells.unshift(st.spell); G.slots = [null, null, null, null, null, null, null, null]; G.spells.slice(0, 4).forEach((s, i) => (G.slots[i] = s)); }
     G.player.recalc(); G.player.hp = G.player.maxHp; G.player.stam = G.player.maxStam;
     G.world = new AH.World(G); G.world.load('hamlet', 'start'); G.mode = 'play'; G.screen = null; G.toast('Ashen Hollow', '#e6dcc4'); AH.Audio.music('hamlet');
     G.dialogueStart('intro');
@@ -140,7 +140,7 @@
   G.peek = (slot) => { try { const s = localStorage.getItem(SAVE_KEY + slot); if (!s) return null; const d = JSON.parse(s); return { area: d.area, level: d.level, day: d.day, hour: d.hour, t: d.t, origin: d.origin, playtime: d.playtime }; } catch (e) { return null; } };
   G.load = (slot) => {
     let d; try { d = JSON.parse(localStorage.getItem(SAVE_KEY + slot)); } catch (e) { return false; } if (!d) return false;
-    Object.assign(G, { flags: d.flags, inv: d.inv, equip: d.equip, spells: d.spells, slots: d.slots, sel: d.sel || 0, skills: d.skills, skillPoints: d.sp, xp: d.xp, level: d.level, fusions: d.fusions || [], waystones: d.waystones, lore: d.lore, choices: d.choices, seen: d.seen || {}, kills: d.kills, hour: d.hour, day: d.day, visited: d.visited, origin: d.origin, playtime: d.playtime, deaths: d.deaths, lastWaystone: d.last, toasts: [], slowmo: 0, hitstop: 0 });
+    Object.assign(G, { flags: d.flags, inv: d.inv, equip: d.equip, spells: d.spells, slots: (d.slots || []).concat([null, null, null, null, null, null, null, null]).slice(0, 8), sel: d.sel || 0, skills: d.skills, skillPoints: d.sp, xp: d.xp, level: d.level, fusions: d.fusions || [], waystones: d.waystones, lore: d.lore, choices: d.choices, seen: d.seen || {}, kills: d.kills, hour: d.hour, day: d.day, visited: d.visited, origin: d.origin, playtime: d.playtime, deaths: d.deaths, lastWaystone: d.last, toasts: [], slowmo: 0, hitstop: 0 });
     G.areaState = {}; Object.keys(d.areaState).forEach((k) => { const s = d.areaState[k]; G.areaState[k] = { objs: s.objs, secrets: s.secrets, killed: s.killed, zones: s.zones, explored: Uint8Array.from(String(s.explored).split('').map(Number)) }; });
     G.fusions.forEach((f) => AH.getSpell(f));
     G.player = new AH.Player(G); Object.assign(G.player, { souls: d.pl.souls, verd: d.pl.verd, aether: d.pl.aether, corruption: d.pl.corruption, schools: d.pl.schools, maxHpPerm: d.pl.maxHpPerm || 0 }); G.player.recalc(); G.player.hp = d.pl.hp; G.player.stam = d.pl.stam;
