@@ -155,38 +155,49 @@
   spr.cobweb = (function () { const P = S.painter(18, 18); [[0, 0, 17, 0], [0, 0, 0, 17], [0, 0, 16, 16], [0, 0, 12, 17], [0, 0, 17, 12]].forEach((l) => P.line(l[0], l[1], l[2], l[3], 'rgba(220,220,230,0.55)')); [5, 9, 13].forEach((r) => { for (let a = 0; a < 20; a++) { const t = (a / 19) * Math.PI / 2; P.px(Math.round(Math.cos(t) * r), Math.round(Math.sin(t) * r), 'rgba(220,220,230,0.4)'); } }); return S.fromCanvas(P.c, 0, 0); })();
   spr.hayBale = (function () { const P = S.painter(26, 20); P.ell(13, 11, 11, 8, ['#c8a850', '#9a7e38', '#6a5222'], 4, 0.1); for (let i = 0; i < 14; i++) P.line(3 + Math.floor(U.hash(i, 1, 4) * 20), 5 + Math.floor(U.hash(i, 2, 4) * 12), 6 + Math.floor(U.hash(i, 3, 4) * 20), 5 + Math.floor(U.hash(i, 4, 4) * 12), '#6a5222'); return finish(P, 13, 18, '#0a0806'); })();
   spr.poppet = (function () { const P = S.painter(10, 16); P.rect(3, 7, 4, 7, '#8a7a5a'); P.disc(5, 4, 3, '#c9b48a'); P.px(4, 4, '#1a1214'); P.px(6, 4, '#1a1214'); P.rect(1, 8, 2, 1, '#8a7a5a'); P.rect(7, 8, 2, 1, '#8a7a5a'); P.line(5, 9, 5, 12, '#8a2e3c'); return finish(P, 5, 15, '#0a0806'); })();
-  spr.hanging = [-1, 0, 1, 0].map((sw, fi) => { /* a weathered gibbet: a limp ragged effigy turning on its rope, a crow on the beam */
-    const P = S.painter(28, 42), r = rnd(91), X = (y) => Math.round(sw * Math.max(0, y - 12) / 16);
-    /* post and beam, mossy and cracked */
-    P.rect(3, 7, 3, 33, '#33261c'); P.rect(3, 7, 1, 33, '#4c3a2a'); P.rect(5, 7, 1, 33, '#221810'); P.rect(2, 6, 22, 3, '#33261c'); P.rect(2, 6, 22, 1, '#4c3a2a'); P.rect(2, 8, 22, 1, '#221810');
-    P.line(6, 16, 12, 9, '#33261c'); P.line(6, 17, 12, 10, '#221810'); for (let k = 0; k < 7; k++) P.px(3 + (k % 3), 14 + k * 3, k % 2 ? '#3a4a2c' : '#2c3a22'); P.px(4, 24, '#2c3a22');
-    P.ell(4, 40, 5, 1, '#3e3c46'); P.rect(1, 39, 7, 2, '#4a4852'); P.px(2, 39, '#6a6874'); P.px(6, 40, '#2e2c34');
-    /* iron chain and hook on the beam, a charm of bone and a black feather */
-    for (let k = 0; k < 4; k++) P.px(9, 9 + k * 2, k % 2 ? '#6a6874' : '#4a4852'); P.px(9, 17, '#e0d6bc'); P.px(8, 18, '#cfc4a8');
-    /* the crow */
-    P.ell(21, 4, 3, 2, '#1c1a22'); P.rect(19, 5, 5, 1, '#121018'); P.px(23, 2, '#1c1a22'); P.px(24, 3, '#1c1a22'); P.px(25, 3, '#6a5a3a'); P.px(23, 3, '#8a8aa0'); P.px(18, 5, '#121018'); P.px(17, 6, '#121018'); P.px(20, 7, '#4a3a2a'); P.px(22, 7, '#4a3a2a');
-    /* rope and noose */
-    const hx = 17 + X(18) - 1;
-    P.line(17, 9, 17 + X(14), 15, '#9a8458'); P.px(16, 9, '#6e5c38'); P.px(18, 9, '#6e5c38'); P.line(17 + X(14), 15, hx + 1, 19, '#9a8458');
-    /* head: a stitched sack, bowed */
-    P.ell(hx, 19, 4, 4, ['#8a7a5a', '#6a5a40', '#3e3426'], 3, 0.1); P.rect(hx - 2, 15, 5, 1, '#4a3c28'); P.px(hx - 2, 18, '#1a1410'); P.px(hx - 1, 19, '#1a1410'); P.px(hx - 3, 19, '#1a1410'); P.px(hx - 2, 20, '#1a1410'); P.px(hx + 1, 19, '#0c0a08'); P.px(hx + 2, 19, '#0c0a08'); P.px(hx + 1, 20, '#0c0a08'); P.px(hx + 2, 20, '#0c0a08');
-    if (fi % 2 === 0) { P.px(hx + 2, 19, '#d04050'); } /* a red glint in the empty eye */
-    for (let k = -2; k <= 2; k++) P.px(hx + k, 22 - (k % 2 ? 0 : 1), '#1a1410');
-    P.px(hx - 3, 17, '#a8987a'); P.px(hx - 2, 16, '#a8987a');
-    /* the rag-robe */
-    const bx = 17 + X(28);
-    P.rect(hx - 3, 23, 7, 1, '#6e5c38');
-    for (let y = 24; y <= 36; y++) { const x0 = Math.round(hx - 4 + (bx - hx) * (y - 24) / 12 - (y - 24) * 0.22), x1 = Math.round(hx + 4 + (bx - hx) * (y - 24) / 12 + (y - 24) * 0.22); P.rect(x0, y, x1 - x0 + 1, 1, y > 33 ? '#2e2822' : '#4a4038'); P.px(x0, y, '#5e5248'); P.px(x1, y, '#2a241e'); }
-    for (let y = 25; y < 36; y += 3) P.px(bx - 1 + (y % 2), y, '#5e5248');
-    /* tattered hem */
-    for (let k = -5; k <= 5; k++) { const hh = 37 + ((k * 7 + 3) % 3 + 3) % 3; P.rect(bx + k, 36, 1, hh - 35, k % 2 ? '#2a241e' : '#3a322a'); }
-    /* dangling sleeves with straw tufts */
-    P.rect(hx - 5 + X(26) - X(18), 25, 2, 8, '#4a4038'); P.rect(hx + 4 + X(26) - X(18), 25, 2, 8, '#3a322a'); P.px(hx - 5 + X(26) - X(18), 33, '#8a7648'); P.px(hx - 4 + X(26) - X(18), 34, '#a89058'); P.px(hx + 5 + X(26) - X(18), 33, '#8a7648'); P.px(hx + 4 + X(26) - X(18), 34, '#a89058');
-    /* a torn red strip that flutters */
-    P.line(bx + 3, 28, bx + 5 + sw, 33, '#8a2a34'); P.px(bx + 5 + sw, 34, '#a8343e');
-    /* bound bare feet */
-    P.rect(bx - 1, 38, 3, 1, '#6e5c38'); P.px(bx - 1, 39, '#a89058'); P.px(bx + 1, 39, '#8a7648');
-    return S.outline(S.fromCanvas(P.c, 4, 40), '#0a0806');
+  spr.hanging = [0, 1, 2, 3, 4, 5].map((fi) => { /* a lady's ghost trapped in an ornate iron cage on a weathered gibbet; she drifts and her gown stirs */
+    const W = 30, H = 48, ph = fi / 6 * 6.2832, sw = Math.round(Math.sin(ph) * 1.4), bob = Math.round(Math.sin(ph + 1) * 0.9), pulse = 0.5 + 0.5 * Math.sin(ph + 2), r = rnd(31);
+    const A = S.painter(W, H);
+    /* gibbet: post, beam, brace, moss, footing */
+    A.rect(3, 7, 3, 40, '#33261c'); A.rect(3, 7, 1, 40, '#4c3a2a'); A.rect(5, 7, 1, 40, '#221810'); A.rect(2, 6, 26, 3, '#33261c'); A.rect(2, 6, 26, 1, '#4c3a2a'); A.rect(2, 8, 26, 1, '#221810');
+    A.line(6, 17, 12, 9, '#33261c'); A.line(6, 18, 12, 10, '#221810'); for (let k = 0; k < 8; k++) A.px(3 + (k % 3), 14 + k * 3, k % 2 ? '#3a4a2c' : '#2c3a22');
+    A.ell(4, 46, 5, 1, '#3e3c46'); A.rect(1, 45, 7, 2, '#4a4852'); A.px(2, 45, '#6a6874'); A.px(6, 46, '#2e2c34');
+    /* chain from the beam to the cage */
+    for (let y = 9; y < 15; y++) { A.px(19 + (y % 2 ? 0 : 1) - 0, y, y % 2 ? '#8a8896' : '#4a4852'); } A.px(19, 14, '#c8a850');
+    /* cage: dome, rings, base and finial */
+    const cx = 18.5; for (let x = 11; x <= 26; x++) { const k = (x - cx) / 8, y = 19 - Math.round(Math.sqrt(Math.max(0, 1 - k * k)) * 4.5); A.px(x, y, '#6a6874'); A.px(x, y + 1, '#3e3c48'); }
+    A.px(19, 14, '#c8a850'); A.rect(18, 15, 3, 1, '#6a6874'); A.px(17, 16, '#6a6874'); A.px(21, 16, '#6a6874');
+    A.rect(12, 20, 14, 21, '#0e121c'); /* dark interior so the ghost glows against it */
+    A.rect(10, 41, 18, 2, '#4a4754'); A.rect(10, 41, 18, 1, '#8a8896'); A.rect(10, 43, 18, 1, '#2a2830'); A.px(10, 41, '#c8a850'); A.px(27, 41, '#c8a850'); A.rect(18, 44, 3, 1, '#4a4754'); A.px(19, 45, '#c8a850'); A.px(19, 46, '#8a6a22');
+    const bars = [11, 14, 17, 20, 23, 26]; bars.forEach((x) => { A.rect(x, 19, 1, 22, '#2e2c36'); A.px(x, 20, '#6a6874'); });
+    [25, 36].forEach((y) => { A.rect(11, y, 16, 1, '#5a5866'); A.px(11, y, '#c8a850'); A.px(26, y, '#c8a850'); });
+    for (let x = 12; x <= 25; x += 2) A.px(x, 41, '#2a2830');
+    const spr = S.outline(S.fromCanvas(A.c, 4, 47), '#0a0806'), g = spr.c.getContext('2d');
+    /* the ghost, painted on its own plate so it can be translucent */
+    const G = S.painter(W, H), gx = 19, by = bob, hair = ['#6a7ab8', '#4e5e98', '#34426f'], skin = ['#eaf6fc', '#c4dcee', '#94b0d2'], gown = ['#9cb0ee', '#7488cc', '#4e5e9a'], lace = '#f6fdff';
+    G.ell(19, 30, 7, 10, 'rgba(110,160,255,' + (0.14 + 0.1 * pulse) + ')');
+    /* hair: a long fall behind the shoulders, swaying */
+    G.ell(gx, 26 + by, 5, 6, hair[1]); G.limb(15, 25 + by, 14 + sw, 38, 3, 3, hair[1]); G.limb(23, 25 + by, 24 + sw, 38, 3, 3, hair[2]); G.px(14 + sw, 38, hair[2]); G.px(24 + sw, 38, hair[2]);
+    /* head and face */
+    G.ell(gx, 25 + by, 3, 4, skin[0]); G.rect(gx + 2, 24 + by, 1, 4, skin[1]); G.px(gx + 1, 28 + by, skin[2]);
+    G.rect(gx - 3, 21 + by, 7, 2, hair[0]); G.px(gx - 3, 23 + by, hair[0]); G.px(gx + 3, 23 + by, hair[1]); G.px(gx - 1, 20 + by, hair[0]); G.px(gx, 20 + by, hair[0]); G.px(gx + 1, 20 + by, hair[0]); G.px(gx + 1, 22 + by, hair[1]); /* parted fringe */
+    G.rect(gx - 2, 25 + by, 1, 2, '#1c2650'); G.rect(gx + 1, 25 + by, 1, 2, '#1c2650'); G.px(gx - 2, 25 + by, fi % 3 ? '#9ff0ff' : '#e8ffff'); G.px(gx + 1, 25 + by, fi % 3 ? '#9ff0ff' : '#e8ffff'); G.px(gx, 27 + by, '#7080b4'); G.px(gx - 1, 28 + by, skin[2]);
+    /* lace collar */
+    G.rect(gx - 4, 29 + by, 9, 1, lace); G.px(gx - 4, 30 + by, lace); G.px(gx - 2, 30 + by, lace); G.px(gx, 30 + by, lace); G.px(gx + 2, 30 + by, lace); G.px(gx + 4, 30 + by, lace);
+    /* bodice: laced, tapering, with a gold cameo */
+    [[9, 31], [8, 32], [7, 33], [6, 34]].forEach((q, k) => { const w = q[0], y = q[1] + by, x0 = gx - Math.floor(w / 2); G.rect(x0, y, w, 1, gown[1]); G.px(x0, y, gown[0]); G.px(x0 + w - 1, y, gown[2]); G.px(gx, y, k % 2 ? gown[2] : lace); });
+    G.px(gx - 2, 32 + by, '#f6cf6a'); G.px(gx - 2, 33 + by, '#c8a040'); G.px(gx - 3, 32 + by, '#c8a040');
+    /* puffed sleeves and reaching hands on the bars */
+    G.ell(gx - 5, 32 + by, 2, 2, gown[0]); G.ell(gx + 5, 32 + by, 2, 2, gown[0]); G.rect(gx - 7, 30 + by, 2, 1, lace); G.rect(gx + 6, 30 + by, 2, 1, lace); G.px(gx - 6, 34 + by, gown[2]); G.px(gx + 6, 34 + by, gown[2]);
+    G.line(gx - 5, 34 + by, 12, 36 + by, skin[1]); G.line(gx + 5, 34 + by, 25, 36 + by, skin[1]); G.rect(11, 35 + by, 2, 3, skin[0]); G.rect(25, 35 + by, 2, 3, skin[0]);
+    /* tiered skirt: solid ruffles, lace trim, dissolving into wisps below */
+    for (let y = 35; y <= 41; y++) { const k = y - 35, half = Math.min(6, 3 + Math.round(k * 0.6)), off = Math.round(sw * k / 6), x0 = gx - half + off, w = half * 2 + 1, yy = y + by; G.rect(x0, yy, w, 1, k % 3 === 2 ? lace : (k % 3 ? gown[1] : gown[0])); G.px(x0 + w - 1, yy, gown[2]); }
+    for (let k = 0; k < 5; k++) { const wx = 13 + k * 2 + Math.round(Math.sin(ph + k) * 1.2); G.px(wx, 42 + by, 'rgba(190,230,255,' + (0.7 - k * 0.1) + ')'); G.px(wx + (k % 2), 43 + by, 'rgba(150,200,255,0.4)'); }
+    G.px(11, 44, 'rgba(170,220,255,0.5)'); G.px(15 + sw, 45, 'rgba(170,220,255,0.35)'); G.px(23, 44 + (fi % 2), 'rgba(170,220,255,0.4)');
+    g.globalAlpha = 0.93; g.drawImage(G.c, 0, 0); g.globalAlpha = 1;
+    /* front bars and rings over the ghost */
+    g.globalAlpha = 0.5; bars.forEach((x) => { g.fillStyle = '#2e2c36'; g.fillRect(x, 19, 1, 22); }); g.globalAlpha = 0.7; g.fillStyle = '#c8a850'; g.fillRect(11, 36, 1, 1); g.fillRect(26, 36, 1, 1); g.globalAlpha = 1;
+    return spr;
   });
   spr.stump = (function () { const P = S.painter(22, 16); P.ell(11, 10, 9, 5, ['#6a5240', '#463428', '#281c14'], 4, 0.1); P.ell(11, 8, 7, 3, ['#8a7258', '#6a5240', '#463428'], 5, 0); P.line(7, 8, 15, 8, '#463428'); P.line(9, 7, 13, 9, '#463428'); return finish(P, 11, 14, '#08060a'); })();
   spr.rock = [1, 2, 3].map((s) => { const P = S.painter(24, 18); P.blob(12, 10, 7 + s, ['#7a7886', '#55536a', '#33313f'], s * 5, 3); P.speckle(4, 4, 16, 12, ['#3e5a34', '#58783f'], 6, s); return finish(P, 12, 16, '#08080c'); });
