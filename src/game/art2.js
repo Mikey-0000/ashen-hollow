@@ -13,6 +13,7 @@
     const R = {
       d,
       set(x, y, c) { x = Math.round(x); y = Math.round(y + OY); if (x < 0 || y < 0 || x >= CW || y >= CH) return; const a = typeof c === 'string' ? rgb(c) : c, i = (y * CW + x) * 4; d[i] = a[0]; d[i + 1] = a[1]; d[i + 2] = a[2]; d[i + 3] = 255; },
+      get(x, y) { x = Math.round(x); y = Math.round(y + OY); if (x < 0 || y < 0 || x >= CW || y >= CH) return null; const i = (y * CW + x) * 4; return d[i + 3] ? [d[i], d[i + 1], d[i + 2]] : null; },
       has(x, y) { x = Math.round(x); y = Math.round(y + OY); return x >= 0 && y >= 0 && x < CW && y < CH && d[(y * CW + x) * 4 + 3] > 0; },
       clear(x, y) { x = Math.round(x); y = Math.round(y + OY); if (x < 0 || y < 0 || x >= CW || y >= CH) return; d[(y * CW + x) * 4 + 3] = 0; },
       /* shaded ellipse; light from top-left. keep(x,y) optional filter */
@@ -161,22 +162,41 @@
       }
       /* face */
       if (front) {
-        const ew = 4, eh = s.bigEyes ? 7 : 6;
-        [hx - 8, hx + 4].forEach((ex, i) => {
-          if (s.style === 'hood' && s.mask) { /* mask: eyes only glow */ for (let y = 0; y < 3; y++) for (let x = 0; x < ew; x++) set(ex + x, hcy + 2 + y, y === 1 ? iris : '#12080c'); return; }
-          for (let y = 0; y < eh; y++) for (let x = 0; x < ew; x++) {
-            let c = iris; if (y === 0) c = ink; else if (y === eh - 1) c = dk(typeof iris === 'string' ? iris : '#222', 0.6);
-            else if (y === 1) c = dk(typeof iris === 'string' ? iris : '#222', 0.55);
-            set(ex + x, hcy + 1 + y, c);
+        const ew = 5, eh = s.bigEyes ? 7 : 6, ic = typeof iris === 'string' ? iris : '#4a7ad0';
+        const isSkin = (x, y) => { const q = R.get(x, y); return q && skin.some((k) => { const r = rgb(k); return Math.abs(r[0] - q[0]) + Math.abs(r[1] - q[1]) + Math.abs(r[2] - q[2]) < 12; }); };
+        [hx - 9, hx + 4].forEach((ex, i) => {
+          if (s.style === 'hood' && s.mask) { /* mask: eyes only glow */ for (let y = 0; y < 3; y++) for (let x = 0; x < 4; x++) set(ex + 1 + x, hcy + 2 + y, y === 1 ? iris : '#12080c'); return; }
+          const px = (u, y, c) => set(ex + (i ? ew - 1 - u : u), hcy + 1 + y, c);   /* u: 0 = outer edge, ew-1 = inner edge */
+          const ird = dk(ic, 0.55), irm = dk(ic, 0.8), irl = mixc(ic, '#ffffff', 0.38), pup = dk(ic, 0.22);
+          for (let u = 0; u < ew; u++) px(u, 0, ink);                     /* thick upper lash line */
+          px(0, -1, ink);                                                  /* outer lash flick */
+          for (let y = 1; y < eh; y++) for (let u = 0; u < ew; u++) {
+            if (y === eh - 1 && (u === 0 || u === ew - 1)) continue;       /* rounded bottom corners */
+            let c = y === 1 ? ird : y === 2 ? irm : y >= eh - 2 ? irl : ic;
+            if (y >= 2 && y <= eh - 2 && (u === 2 || u === 3) && y <= 3 + (eh > 6 ? 1 : 0)) c = pup;   /* pupil */
+            if (u === 0 && y < eh - 1) c = y === 1 ? ink : ird;            /* dark outer rim */
+            px(u, y, c);
           }
-          set(ex + (i ? ew - 1 : 0), hcy + 2, ink); set(ex + (i ? 0 : ew - 1), hcy + 2, '#fff8f0'); set(ex + (i ? 1 : ew - 2), hcy + 3, '#ffffff'); set(ex + (i ? 2 : 1), hcy + eh, '#ffffff');
-          if (s.eyeGlow) set(ex + 1, hcy + 1 + eh - 1, s.eyeGlow);
+          set(ex + 1 + (i ? 0 : 0), hcy + 2, '#ffffff'); set(ex + 1, hcy + 3, '#ffffff');              /* big catch-light, always top-left */
+          set(ex + ew - 2, hcy + eh, '#ffffff');                                                        /* small sparkle bottom-right */
+          if (s.eyeGlow) px(2, eh - 1, s.eyeGlow);
+          /* brow, only where skin shows (fringe may cover it) */
+          if (!s.bigEyes) for (let u = 1; u < ew; u++) { const bx = ex + (i ? ew - 1 - u : u), by = hcy - 1 + (u > 2 ? 0 : 1) - (u === 1 ? 0 : 0); if (isSkin(bx, by)) set(bx, by, mixc(hair[2], skin[2], 0.25)); }
+          /* blush */
+          const bl = mixc(skin[1], '#e8707a', 0.5); [1, 2].forEach((u) => { const bx = ex + (i ? ew - 1 - u : u), by = hcy + 8; if (isSkin(bx, by)) set(bx, by, bl); });
         });
-        if (!s.mask) { set(hx, hcy + 8, skin[2]); set(hx - 1, hcy + 9, skin[2]); set(hx, hcy + 9, skin[2]); set(hx - 1, hcy + 10, mixc(skin[2], '#7a2a30', 0.5)); set(hx, hcy + 10, mixc(skin[2], '#7a2a30', 0.5)); }
+        if (!s.mask) {
+          set(hx, hcy + 8, mixc(skin[0], skin[1], 0.55));                   /* nose: a single soft pixel */
+          const mc = mixc(skin[2], '#8a2a34', 0.7), my = hcy + 10;
+          if (isSkin(hx - 1, my)) { set(hx - 1, my, mc); set(hx, my, mc); }
+        }
         if (s.beard) { for (let y = hcy + 6; y <= hcy + 14; y++) for (let x = hx - 9; x <= hx + 9; x++) { if (!R.has(x, y)) continue; const jaw = y > hcy + 9, stache = y >= hcy + 8 && y <= hcy + 9 && Math.abs(x - hx) < 5 && Math.abs(x - hx) > 0, sideb = Math.abs(x - hx) > 7 && y > hcy + 5; if (jaw || stache || sideb) set(x, y, y > hcy + 12 ? hair[2] : hair[1]); } }
       } else if (side) {
-        const ex = hx + 6; for (let y = 0; y < (s.bigEyes ? 6 : 5); y++) for (let x = 0; x < 3; x++) set(ex + x, hcy + 1 + y, y === 0 ? ink : iris);
-        set(ex + 2, hcy + 2, '#fff8f0'); set(hx + 7, hcy + 9, mixc(skin[2], '#7a2a30', 0.5)); set(hx + 8, hcy + 9, mixc(skin[2], '#7a2a30', 0.5));
+        const ex = hx + 6, eh = s.bigEyes ? 6 : 5, ic = typeof iris === 'string' ? iris : '#4a7ad0';
+        for (let y = 0; y < eh; y++) for (let x = 0; x < 3; x++) set(ex + x, hcy + 1 + y, y === 0 ? ink : y === 1 ? dk(ic, 0.55) : y >= eh - 1 ? mixc(ic, '#ffffff', 0.38) : (x === 2 && y >= 2 && y <= 3) ? dk(ic, 0.22) : ic);
+        set(ex, hcy + 2, '#ffffff'); set(ex, hcy + 3, '#ffffff'); set(ex + 2, hcy + 1, ink); set(ex + 3, hcy + 1, ink);
+        const sm = mixc(skin[2], '#8a2a34', 0.7); set(hx + 6, hcy + 10, sm); set(hx + 7, hcy + 10, sm); set(hx + 9, hcy + 7, mixc(skin[0], skin[1], 0.55));
+        set(ex - 1, hcy + 8, mixc(skin[1], '#e8707a', 0.5));
         if (s.beard) { for (let y = hcy + 7; y <= hcy + 13; y++) for (let x = hx - 2; x <= hx + 10; x++) if (R.has(x, y) && y > hcy + 8) set(x, y, hair[1]); }
       }
       /* hat */
