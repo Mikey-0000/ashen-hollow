@@ -41,7 +41,7 @@
     return R;
   }
 
-  function figure(s, dir, f) {
+  function figure(s, dir, f, pose) {
     const R = paint(), set = R.set, ell = R.ell, rect = R.rect;
     const body = s.cloth, skin = s.skin, hair = s.hair || s.hood || ['#6a6a72', '#44444c', '#2a2a30'], pants = s.pants || body, boots = s.boots || pants;
     const ink = dk(hair[2], 0.45), eyeC = s.eyeGlow || s.eyes || '#2a1a1a', lum = (c) => { const a = rgb(c); return a[0] * 0.3 + a[1] * 0.59 + a[2] * 0.11; }, iris = lum(eyeC) < 70 ? (lum(hair[1]) > 150 ? '#4a8ad8' : lum(hair[1]) > 90 ? '#3a9a6a' : '#5a7ad0') : eyeC;
@@ -107,7 +107,10 @@
     }
     if (front) { arm(cx - torsoHW - 3, -step * 2, 'L'); arm(cx + torsoHW - 1, step * 2, 'R'); }
     else if (back) { arm(cx - torsoHW - 3, step * 2, 'L'); arm(cx + torsoHW - 1, -step * 2, 'R'); }
+    else if (pose === 'wind') { rect(cx + 8, top - 9, cx + 11, top + 5, body, 1); ell(cx + 9.5, top - 10, 2.6, 2.6, skin, null, true); }
+    else if (pose === 'lunge') { rect(cx + 2, top + 3, cx + 13, top + 6, body, 1); ell(cx + 14.5, top + 4.5, 2.6, 2.6, skin, null, true); }
     else { /* side: one near arm swings front/back */ arm(cx - 2 + step * 4, 0, 'L'); }
+    if (s.shield && !back) { const sx = side ? cx + 2 : cx - torsoHW - 7; rect(sx, top + 4, sx + 8, top + 19, s.shield, 2); for (let y = top + 6; y < top + 17; y++) set(sx + 4, y, s.shield[0]); for (let x = sx + 1; x < sx + 8; x++) set(x, top + 11, s.shield[0]); }
     if (s.scarf && !back) {
       for (let x = cx - 7; x <= cx + 6; x++) for (let y = top - 1; y <= top + 2; y++) { const dy = y - (top - 1); if (dy === 0 && (x < cx - 5 || x > cx + 4)) continue; set(x, y, dy === 0 ? s.scarf[0] : dy === 3 ? s.scarf[2] : s.scarf[1]); }
       if (s.scarfTail) rect(cx + 3, top + 2, cx + 6, top + 11 + (f ? 1 : 0), s.scarf, 1);
@@ -188,7 +191,15 @@
     /* ---- post: ghost fade, tatters ---- */
     if (floatF) { for (let y = 46; y < CH - OY; y++) for (let x = 0; x < CW; x++) { if (!R.has(x, y)) continue; const t = (y - 46) / 20; const i = (Math.round(y + OY) * CW + x) * 4; R.d[i + 3] = Math.round(255 * Math.max(0, 1 - t * 0.95)); if (R.d[i + 3] < 30) R.d[i + 3] = 0; } }
     if (s.tatter) { for (let x = 0; x < CW; x++) { const cut = (x * 5 + dir) % 4; for (let y = hemY - 1 + (0); y > hemY - 1 - cut; y--) R.clear(x, y + bob); } }
+    if (s.rowEdit) editRows(R, s.rowEdit[0], s.rowEdit[1]);
     return R;
+  }
+  /* remove (n < 0) or repeat (n > 0) pixel rows from `at` down, keeping the feet where they were */
+  function editRows(R, at, n) {
+    const d = R.d, src = []; for (let y = 0; y < CH; y++) { src.push(y); if (n > 0 && y === at + OY) for (let k = 0; k < n; k++) src.push(y); }
+    const keep = n < 0 ? src.filter((y) => y < at + OY || y >= at + OY - n) : src, off = n < 0 ? -n : -n, out = new Uint8ClampedArray(d.length);
+    keep.forEach((sy, i) => { const dy = i + off; if (dy < 0 || dy >= CH) return; out.set(d.subarray(sy * CW * 4, (sy + 1) * CW * 4), dy * CW * 4); });
+    d.set(out);
   }
   function mixHex(a, b, k) { const m = mixc(a, b, k); return '#' + m.map((v) => Math.round(v).toString(16).padStart(2, '0')).join(''); }
   function mixc(a, b, k) { const A = typeof a === 'string' ? rgb(a) : a, B = typeof b === 'string' ? rgb(b) : b; return [A[0] + (B[0] - A[0]) * k, A[1] + (B[1] - A[1]) * k, A[2] + (B[2] - A[2]) * k]; }
@@ -216,6 +227,14 @@
     return out;
   }
   Art.build2 = build2;
+  /* ---- enemies: the humanoids are redrawn in the same style (side view; the game flips them) ---- */
+  function pose(spec, f, ps) { return toSprite(figure(spec, 2, f, ps), spec); }
+  const WRETCH = { skin: ['#9aaa84', '#76865f', '#4e5a40'], style: 'short', hair: ['#6a6a60', '#46463e', '#2a2a24'], wide: 2, eyes: '#ff4a3a', eyeGlow: '#ff4a3a', bigEyes: true, cloth: ['#7a6e60', '#58504a', '#3a342e'], len: 'short', tatter: true,
+    pants: ['#4a4036', '#352d26', '#231e19'], boots: ['#3a3028', '#2a221c', '#1a1612'], belt: ['#5a4a38', '#3e3224', '#2a2118'], outline: '#1a1a14', rowEdit: [36, -3] };
+  Art.wretch = { walk: [pose(WRETCH, 1), pose(WRETCH, 0), pose(WRETCH, 2), pose(WRETCH, 0)], wind: pose(WRETCH, 0, 'wind'), lunge: pose(WRETCH, 0, 'lunge'), stand: pose(WRETCH, 0) };
+  const SENT = { skin: ['#e0d8c0', '#b0a68a', '#706650'], style: 'helm', helm: ['#d8d0b8', '#a89c80', '#6a604c'], eyes: '#ff7a3a', plume: null, broad: 1, cloth: ['#6a5a50', '#4a3e38', '#2e2622'], len: 'short', tatter: true,
+    pants: ['#4a3e34', '#33291f', '#221b14'], boots: ['#3a3028', '#2a221c', '#1a1612'], pauldron: ['#a8b0c4', '#727c94', '#4a5268'], belt: ['#4a3a30', '#33271f', '#221914'], shield: ['#7a8aa8', '#56658a', '#3a4562'], outline: '#14141c', rowEdit: [34, 3] };
+  Art.sentinel = { walk: [pose(SENT, 1), pose(SENT, 0), pose(SENT, 2), pose(SENT, 0)], stand: pose(SENT, 0), slam: pose(SENT, 0, 'wind') };
   const old = { hero: Art.hero, npc: Object.assign({}, Art.npc) };
   if (Art.hero && Art.hero.spec) Art.hero = build2(Art.hero.spec);
   Object.keys(old.npc).forEach((k) => { const o = old.npc[k]; if (o && o.spec) Art.npc[k] = build2(o.spec); });
