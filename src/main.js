@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const AH = window.AH, U = AH.U, G = AH.G, Input = AH.Input, W = AH.W, H = AH.H, SC = AH.UI.screens;
-  const canvas = document.getElementById('screen'), buf = U.makeCanvas(W, H), g = buf.getContext('2d'); g.imageSmoothingEnabled = false; AH.Present.init(canvas); AH.Present.size(W, H);
+  const canvas = document.getElementById('screen'), buf = U.makeCanvas(W * AH.SC, H * AH.SC), g = buf.getContext('2d'); g.setTransform(AH.SC, 0, 0, AH.SC, 0, 0); g.imageSmoothingEnabled = false; AH.Present.init(canvas); AH.Present.size(W, H);
   let scale = 2, offX = 0, offY = 0;
   AH.resize = function () { const stage = document.getElementById('stage'); const iw = stage ? stage.clientWidth : window.innerWidth, ih = stage ? stage.clientHeight : window.innerHeight; let s = Math.min(iw / W, ih / H); if (G.settings.scale === 'integer') s = Math.max(1, Math.floor(s)); const cw = Math.floor(W * s), ch = Math.floor(H * s); canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px'; AH.Present.size(cw, ch); canvas.style.left = Math.floor((iw - cw) / 2) + 'px'; canvas.style.top = Math.floor((ih - ch) / 2) + 'px'; scale = s; };
   window.addEventListener('resize', AH.resize);

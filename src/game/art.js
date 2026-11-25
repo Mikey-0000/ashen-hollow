@@ -251,7 +251,7 @@
   }
 
   function build(spec) {
-    const out = { down: [], up: [], side: [] };
+    const out = { down: [], up: [], side: [], spec };
     ['down', 'up', 'side'].forEach((d, di) => {
       for (let f = 0; f < 3; f++) {
         const P = figure(spec, di, f);

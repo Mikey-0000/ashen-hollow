@@ -24,4 +24,4 @@ Translate the *language*, not the artwork: no characters, logos or compositions 
 - Hands/boots visible; eyes spaced wider (column doubling at head centre).
 
 ## Status
-Done: chibi head pass (art.js `chibi()`, opt-out `noChibi`). Next: 2x hi-res buffer (src/core/hires.js drafted), native-2x characters, accent-colour pass on UI/world.
+Done: native-2x chibi characters (src/game/art2.js, reference: user pixel sheet), 2x render buffer (AH.SC=2), anti-aliased 2x upscale of all other sprites (hires.js, used after 3 draws).

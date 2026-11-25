@@ -38,15 +38,15 @@
   S.fromCanvas = function (c, ax, ay) { return { c, w: c.width, h: c.height, ax: ax === undefined ? c.width >> 1 : ax, ay: ay === undefined ? c.height : ay, _sil: {}, _flip: null }; };
   S.flipped = function (spr) {
     if (spr._flip) return spr._flip;
-    const c = U.makeCanvas(spr.w, spr.h), g = c.getContext('2d');
-    g.translate(spr.w, 0); g.scale(-1, 1); g.drawImage(spr.c, 0, 0);
-    spr._flip = { c, w: spr.w, h: spr.h, ax: spr.w - spr.ax, ay: spr.ay, _sil: {}, _flip: spr };
+    const cw = spr.c.width, c = U.makeCanvas(cw, spr.c.height), g = c.getContext('2d');
+    g.translate(cw, 0); g.scale(-1, 1); g.drawImage(spr.c, 0, 0);
+    spr._flip = { c, w: spr.w, h: spr.h, ax: spr.w - spr.ax, ay: spr.ay, hi: spr.hi, _sil: {}, _flip: spr };
     return spr._flip;
   };
   S.sil = function (spr, color) {
     let s = spr._sil[color]; if (s) return s;
-    const c = U.makeCanvas(spr.w, spr.h), g = c.getContext('2d');
-    g.drawImage(spr.c, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, spr.w, spr.h);
+    const c = U.makeCanvas(spr.c.width, spr.c.height), g = c.getContext('2d');
+    g.drawImage(spr.c, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height);
     return (spr._sil[color] = c);
   };
   /* o: {flip, alpha, flash(0..1), flashColor, dx per row fn, scaleY} */
@@ -54,17 +54,16 @@
     if (!spr) return;
     o = o || {};
     const s = o.flip ? S.flipped(spr) : spr;
-    const px = Math.round(x - s.ax), py = Math.round(y - s.ay);
+    const k = s.hi ? 2 : 1, px = Math.round((x - s.ax) * k) / k, py = Math.round((y - s.ay) * k) / k;
     const pa = g.globalAlpha;
     if (o.alpha !== undefined) g.globalAlpha = pa * o.alpha;
-    if (o.shear) {
-      for (let r = 0; r < s.h; r++) g.drawImage(s.c, 0, r, s.w, 1, px + Math.round(o.shear(r, s.h)), py + r, s.w, 1);
-    } else g.drawImage(s.c, px, py);
-    if (o.flash) {
-      g.globalAlpha = pa * o.flash * (o.alpha === undefined ? 1 : o.alpha);
-      const sc = S.sil(s, o.flashColor || '#ffffff');
-      if (o.shear) { for (let r = 0; r < s.h; r++) g.drawImage(sc, 0, r, s.w, 1, px + Math.round(o.shear(r, s.h)), py + r, s.w, 1); } else g.drawImage(sc, px, py);
-    }
+    const blit = (src) => {
+      if (o.shear) { for (let r = 0; r < s.c.height; r++) g.drawImage(src, 0, r, s.c.width, 1, px + Math.round(o.shear(r / k, s.h) * k) / k, py + r / k, s.w, 1 / k); }
+      else g.drawImage(src, px, py, s.w, s.h);
+    };
+    if (!s.hi && !o.shear && AH.Hi && AH.Hi.on && (s._n = (s._n | 0) + 1) > 3 && s.c.width * s.c.height <= 36000) g.drawImage(AH.Hi.of(s.c), px, py, s.w, s.h);
+    else blit(s.c);
+    if (o.flash) { g.globalAlpha = pa * o.flash * (o.alpha === undefined ? 1 : o.alpha); blit(S.sil(s, o.flashColor || '#ffffff')); }
     g.globalAlpha = pa;
   };
   /* stack parts (each {spr, x, y} relative to a shared origin) into one new sprite */

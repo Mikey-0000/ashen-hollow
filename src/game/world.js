@@ -40,7 +40,7 @@
       if (this.hidden || !this.d.shadow) return;
       const spr = this.frame(sun.time); if (!spr) return;
       const sx = this.x - cam.x, sy = this.y - cam.y; if (sx < -90 || sx > W + 90 || sy < -30 || sy > H + 120) return;
-      g.save(); g.setTransform(1, 0, sun.k, -sun.len, Math.round(sx), Math.round(sy)); g.globalAlpha = sun.alpha;
+      g.save(); const K = AH.SC || 1; g.setTransform(K, 0, sun.k * K, -sun.len * K, Math.round(sx) * K, Math.round(sy) * K); g.globalAlpha = sun.alpha;
       g.drawImage(S.sil(spr, '#000000'), -spr.ax, -spr.ay); g.restore(); g.globalAlpha = 1;
     }
     interactable() { return !this.hidden && this.d.act && !this.taken; }

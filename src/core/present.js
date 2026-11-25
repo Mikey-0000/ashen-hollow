@@ -38,12 +38,12 @@
     P.mode = mode; frame++;
     if (mode === 'crisp') { dg.imageSmoothingEnabled = false; dg.globalCompositeOperation = 'source-over'; dg.globalAlpha = 1; dg.drawImage(buf, 0, 0, cw, ch); return; }
     /* sharp bilinear: integer nearest step, then smooth */
-    const k = Math.max(1, Math.min(8, Math.floor(Math.min(cw / W, ch / H))));
+    const BW = buf.width, BH = buf.height, k = Math.max(1, Math.min(8, Math.floor(Math.min(cw / BW, ch / BH))));
     dg.globalCompositeOperation = 'source-over'; dg.globalAlpha = 1;
-    if (cw === W * k && ch === H * k) { dg.imageSmoothingEnabled = false; dg.drawImage(buf, 0, 0, cw, ch); }
+    if (cw === BW * k && ch === BH * k) { dg.imageSmoothingEnabled = false; dg.drawImage(buf, 0, 0, cw, ch); }
     else {
-      if (!mid || mid.width !== W * k || mid.height !== H * k) { mid = mk(W * k, H * k); mg = mid.getContext('2d'); }
-      mg.imageSmoothingEnabled = false; mg.drawImage(buf, 0, 0, W * k, H * k);
+      if (!mid || mid.width !== BW * k || mid.height !== BH * k) { mid = mk(BW * k, BH * k); mg = mid.getContext('2d'); }
+      mg.imageSmoothingEnabled = false; mg.drawImage(buf, 0, 0, BW * k, BH * k);
       dg.imageSmoothingEnabled = true; try { dg.imageSmoothingQuality = 'high'; } catch (e) { /* older browsers */ }
       dg.drawImage(mid, 0, 0, cw, ch);
     }
