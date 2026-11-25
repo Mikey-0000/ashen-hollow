@@ -38,7 +38,7 @@
   .frame::before, .frame::after { content: ""; position: absolute; left: -22px; right: -22px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold2), transparent); }
   .frame::before { top: -14px; } .frame::after { bottom: -14px; }
   #stage { position: absolute; inset: 0; overflow: hidden; }
-  #screen { position: absolute; image-rendering: pixelated; image-rendering: crisp-edges; background: #000; cursor: none; outline: none; }
+  #screen { position: absolute; background: #000; cursor: none; outline: none; }
   .corner { position: absolute; width: 34px; height: 34px; z-index: 3; pointer-events: none; }
   .corner svg { width: 100%; height: 100%; display: block; }
   .c1 { left: -12px; top: -12px; } .c2 { right: -12px; top: -12px; transform: scaleX(-1); }
@@ -327,6 +327,7 @@
 <script src="src/core/sprites.js"></script>
 <script src="src/core/particles.js"></script>
 <script src="src/core/lighting.js"></script>
+<script src="src/core/present.js"></script>
 <script src="src/core/weather.js"></script>
 <script src="src/game/art.js"></script>
 <script src="src/game/tiles.js"></script>

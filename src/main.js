@@ -2,9 +2,9 @@
 (function () {
   'use strict';
   const AH = window.AH, U = AH.U, G = AH.G, Input = AH.Input, W = AH.W, H = AH.H, SC = AH.UI.screens;
-  const canvas = document.getElementById('screen'), g = canvas.getContext('2d'); canvas.width = W; canvas.height = H; g.imageSmoothingEnabled = false;
+  const canvas = document.getElementById('screen'), buf = U.makeCanvas(W, H), g = buf.getContext('2d'); g.imageSmoothingEnabled = false; AH.Present.init(canvas); AH.Present.size(W, H);
   let scale = 2, offX = 0, offY = 0;
-  AH.resize = function () { const stage = document.getElementById('stage'); const iw = stage ? stage.clientWidth : window.innerWidth, ih = stage ? stage.clientHeight : window.innerHeight; let s = Math.min(iw / W, ih / H); if (G.settings.scale === 'integer') s = Math.max(1, Math.floor(s)); const cw = Math.floor(W * s), ch = Math.floor(H * s); canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px'; canvas.style.left = Math.floor((iw - cw) / 2) + 'px'; canvas.style.top = Math.floor((ih - ch) / 2) + 'px'; scale = s; };
+  AH.resize = function () { const stage = document.getElementById('stage'); const iw = stage ? stage.clientWidth : window.innerWidth, ih = stage ? stage.clientHeight : window.innerHeight; let s = Math.min(iw / W, ih / H); if (G.settings.scale === 'integer') s = Math.max(1, Math.floor(s)); const cw = Math.floor(W * s), ch = Math.floor(H * s); canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px'; AH.Present.size(cw, ch); canvas.style.left = Math.floor((iw - cw) / 2) + 'px'; canvas.style.top = Math.floor((ih - ch) / 2) + 'px'; scale = s; };
   window.addEventListener('resize', AH.resize);
   Input.setScaler((cx, cy) => { const r = canvas.getBoundingClientRect(); return { x: (cx - r.left) / r.width * W, y: (cy - r.top) / r.height * H }; });
 
@@ -15,6 +15,7 @@
   function startAudio() { if (audioStarted) return; audioStarted = true; AH.Audio.init(); G.applySettings(); AH.Audio.music(G.mode === 'title' ? 'title' : G.world ? G.world.def.music : 'title'); }
   ['keydown', 'mousedown', 'touchstart'].forEach((e) => window.addEventListener(e, startAudio, { once: false }));
 
+  window.addEventListener('keydown', (e) => { if (e.code === 'F2') { e.preventDefault(); const o = ['smooth', 'soft', 'crisp']; G.settings.display = o[(o.indexOf(G.settings.display) + 1) % 3]; try { G.saveSettings(); } catch (er) {} if (G.toast && G.mode === 'play') G.toast('Picture: ' + G.settings.display + '  (F2)', '#9ab8ff'); } });
   G.loadSettings(); AH.resize();
   G.mode = 'title';
   let last = performance.now(), acc = 0, realT = 0;
@@ -82,6 +83,7 @@
       if (G.screen && SC[G.screen]) SC[G.screen].draw(g, G, time);
     }
     if (G.fade.a > 0) { g.globalAlpha = U.clamp(G.fade.a, 0, 1); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }    drawCursor();
+    AH.Present.render(buf);
   }
   function frame(now) {
     const real = Math.min(0.1, (now - last) / 1000); last = now; acc += real; let n = 0;
