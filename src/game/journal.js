@@ -25,7 +25,15 @@
       ['Hear the coven out beside their fire.', () => F('met_vesna')], ['Swear a pact, or walk away.', () => F('coven_ally') || F('coven_hostile') || F('vesna_refused')]],
       done: () => F('coven_ally') || F('coven_hostile') || F('vesna_refused'), note: () => (F('coven_ally') ? 'You swore the pact (+taint).' : F('vesna_refused') ? 'You refused politely.' : F('coven_hostile') ? 'The coven is hostile.' : '') },
     { id: 'ilse', title: "Ilse's Twelve", who: 'Ilse', show: () => F('met_ilse'), steps: [
-      ['Twelve of her people went down to look at the bell.', () => F('ilse_bell_known')], ['Learn what became of them.', () => F('choir_end')]], done: () => F('choir_end'), note: () => '' },
+      ['Twelve of her people went down to look at the bell.', () => F('ilse_bell_known')], ['Ask Ilse what became of them.', () => F('ilse_quest')],
+      ["Recover the wardens' tags from the Catacombs.", () => F('ilse_done')]], done: () => F('ilse_done'),
+      note: () => (F('ilse_done') ? 'All twelve names are carved.' : F('ilse_quest') ? 'Returned ' + (G().flags.ilse_tags || 0) + '/12. Carrying ' + G().countItem('warden_tag') + '.' : '') },
+    { id: 'corwin', title: 'Ash, Tansy and Brute', who: 'Corwin', show: () => F('corwin_dogs'), steps: [
+      ['Put down three Hollow Hounds.', () => F('corwin_dogs_done') || ((G().seen.hound || 0) - (G().flags.corwin_hound_base || 0)) >= 3], ['Tell Corwin.', () => F('corwin_dogs_done')]], done: () => F('corwin_dogs_done'),
+      note: () => (F('corwin_dogs_done') ? '' : Math.min(3, (G().seen.hound || 0) - (G().flags.corwin_hound_base || 0)) + ' of 3 laid to rest.') },
+    { id: 'brothers', title: "The Abbot's Brother", who: 'Aldric', show: () => F('aldric_stance') || F('abbot_hint'), steps: [
+      ["Find what the Abbot wrote in the lowest hall.", () => !!(G().lore || {}).abbot_journal], ['Read it to Aldric.', () => F('aldric_forgave')]], done: () => F('aldric_forgave'),
+      note: () => (F('aldric_forgave') ? 'Aldric forgave him. He asked you to carry the message.' : '') },
     { id: 'lady', title: 'The Caged Lady', who: 'A hanging cage', show: () => F('ghost_freed') || F('ghost_bound') || sigils() > 0, steps: [
       ['A spirit is held in a cage. Look into it.', () => F('ghost_freed') || F('ghost_bound')]], done: () => F('ghost_freed') || F('ghost_bound'),
       note: () => (F('ghost_freed') ? 'You set her free.' : F('ghost_bound') ? 'You bound her to your will.' : '') },
