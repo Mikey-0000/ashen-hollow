@@ -151,7 +151,7 @@
           this.hitSet.add(e); const crit = e.status.stunned || e.vulnerable; const r = AH.Combat.hit(e, dmg, { src: this, ang, melee: true, school: 'phys', undeadMul: wp.vsUndead, crit, big: this.combo === 2, tags: ['melee'] });
           if (r > 0) { landed++; e.shove(ang, a.kb); e.stagger(this.combo === 2 ? 0.45 : 0.2); }
         });
-        w.objs.forEach((o) => { if (!o.hidden && o.d.act && U.dist(this.x + Math.cos(this.aimA) * 14, this.y + Math.sin(this.aimA) * 14, o.x, o.y - 6) < a.reach) AH.Interact.onHit(o, this); });
+        w.objs.forEach((o) => { if (!o.hidden && (o.d.act || o.d.living) && U.dist(this.x + Math.cos(this.aimA) * 14, this.y + Math.sin(this.aimA) * 14, o.x, o.y - 6) < a.reach) AH.Interact.onHit(o, this); });
         if (landed === 0) { w.world && 0; }
       }
       if (t > a.wind + a.act) {

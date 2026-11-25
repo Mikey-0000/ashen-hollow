@@ -200,7 +200,7 @@
     ring(x, y, r, col, life, sy) { AH.Particles.ringBurst(x, y, r, col, life); }
     /* a spell/attack struck point (x,y,r): let world objects respond */
     spellHit(x, y, r, spell, extra) {
-      this.objs.forEach((o) => { if (o.hidden || o.taken) return; const d = o.d; if (!d.act && !d.ignite) return; if (U.dist(x, y, o.x, o.y - 6) > r + 10) return; AH.Interact.onSpell(o, spell, this.G, extra); });
+      this.objs.forEach((o) => { if (o.hidden || o.taken) return; const d = o.d; if (!d.act && !d.ignite && !d.living) return; if (U.dist(x, y, o.x, o.y - 6) > r + 10) return; AH.Interact.onSpell(o, spell, this.G, extra); });
     }
     /* fire-sources the gas can ignite */
     fireNear(x, y, r) { return this.objs.some((o) => !o.hidden && o.d.ignite && U.dist(x, y, o.x, o.y - 8) < r); }
