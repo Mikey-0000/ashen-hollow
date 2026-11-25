@@ -1,0 +1,7 @@
+<!DOCTYPE html><html><body style="margin:0;background:#2a2a30"><canvas id="c" width="1000" height="920"></canvas>
+<script src="../src/core/util.js"></script><script src="../src/core/font.js"></script><script src="../src/core/sprites.js"></script><script src="../src/game/art.js"></script>
+<script>
+const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
+let y=6;const A=AH.Art;
+['hero','marta','vesna','aldric','wren','hexcaller'].forEach(n=>{const set=n==='hero'?A.hero:A.npc[n];let x=6;['down','up','side'].forEach(d=>set[d].forEach(s=>{g.drawImage(s.c,x,y,s.w*5,s.h*5);x+=s.w*5+6;}));y+=150;});
+</script></body></html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><body style="margin:0;background:#2a2a30"><canvas id="c" width="1100" height="1000"></canvas>
+<script src="../src/core/util.js"></script><script src="../src/core/font.js"></script><script src="../src/core/sprites.js"></script><script src="../src/game/art.js"></script>
+<script>
+const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
+const S=AH.Sprites,A=AH.Art;let x=10,y=10,rowH=0;
+function put(spr,sc){ if(x+spr.w*sc>1090){x=10;y+=rowH+8;rowH=0;} g.drawImage(spr.c,x,y,spr.w*sc,spr.h*sc);x+=spr.w*sc+10;rowH=Math.max(rowH,spr.h*sc);}
+['hero','marta','vesna','aldric','wren','hexcaller'].forEach(n=>{const set=n==='hero'?A.hero:A.npc[n];['down','up','side'].forEach(d=>set[d].forEach(s=>put(s,4)));x=10;y+=rowH+8;rowH=0;});
+x=10;
+A.wretch.walk.slice(0,3).concat([A.wretch.wind,A.wretch.lunge]).forEach(s=>put(s,4));
+A.hound.run.slice(0,3).concat([A.hound.crouch,A.hound.air]).forEach(s=>put(s,3));
+x=10;y+=rowH+8;rowH=0;
+A.wisp.slice(0,3).forEach(s=>put(s,4));A.sentinel.walk.slice(0,2).concat([A.sentinel.slam]).forEach(s=>put(s,3));A.crow.fly.concat([A.crow.idle]).forEach(s=>put(s,4));A.wraith.slice(0,2).forEach(s=>put(s,4));
+put(A.stag.stand,3);put(A.boss.idle[0],3);put(A.boss.raise,2);
+</script></body></html>

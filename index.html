@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ashen Hollow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Ashen Hollow - a dark-fantasy pixel-art action RPG of witchcraft, forgotten gods and a village that remembers.">
+<style>
+  :root {
+    --ink: #07060a; --gold: #c9a45c; --gold2: #8a6a34; --bone: #e6dcc4; --dim: #8d8294;
+    --ember: #ff9a3c; --teal: #7fe0c0; --blood: #c04058;
+    --serif: "Palatino Linotype", "Book Antiqua", Palatino, "URW Palladio L", Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--ink); color: var(--bone); font-family: var(--serif); overflow: hidden; }
+  body { display: flex; flex-direction: column; background: radial-gradient(1200px 700px at 50% 38%, #1c1424 0%, #0b0810 55%, #040306 100%); }
+  #embers { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1; box-shadow: inset 0 0 180px 40px rgba(0,0,0,.85); }
+
+  header { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 26px 8px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .sigil { width: 38px; height: 38px; filter: drop-shadow(0 0 8px rgba(255,154,60,.45)); animation: pulse 5s ease-in-out infinite; }
+  @keyframes pulse { 50% { filter: drop-shadow(0 0 14px rgba(255,154,60,.8)); } }
+  .brand h1 { margin: 0; font-size: 22px; font-weight: 400; letter-spacing: .42em; text-transform: uppercase; color: var(--gold); text-shadow: 0 0 18px rgba(201,164,92,.35), 0 2px 0 #000; }
+  .brand small { display: block; font-size: 10.5px; letter-spacing: .3em; color: var(--dim); text-transform: uppercase; margin-top: 2px; }
+  nav { display: flex; gap: 10px; }
+  button.rune { font-family: var(--serif); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--bone); cursor: pointer;
+    background: linear-gradient(#2a2330, #17121c); border: 1px solid var(--gold2); padding: 8px 18px 7px; position: relative;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); transition: color .15s, background .15s, transform .1s; }
+  button.rune:hover, button.rune:focus-visible { color: #fff; background: linear-gradient(#4a3a28, #2a1f16); outline: none; transform: translateY(-1px); }
+  button.rune kbd { margin-left: 8px; }
+  kbd { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--gold); border: 1px solid #5a4a32; border-bottom-width: 2px; background: #120e16; padding: 1px 6px; border-radius: 3px; }
+
+  main { position: relative; z-index: 2; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 4px 20px; }
+  .frame { position: relative; width: min(100%, calc((100vh - 168px) * 16 / 9)); aspect-ratio: 16 / 9; background: #000;
+    box-shadow: 0 0 0 2px #0a0810, 0 0 0 4px var(--gold2), 0 0 0 6px #0a0810, 0 0 0 7px #4a3a22, 0 0 60px 10px rgba(255,154,60,.10), 0 30px 80px rgba(0,0,0,.9); }
+  .frame::before, .frame::after { content: ""; position: absolute; left: -22px; right: -22px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold2), transparent); }
+  .frame::before { top: -14px; } .frame::after { bottom: -14px; }
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+  #screen { position: absolute; image-rendering: pixelated; image-rendering: crisp-edges; background: #000; cursor: none; outline: none; }
+  .corner { position: absolute; width: 34px; height: 34px; z-index: 3; pointer-events: none; }
+  .corner svg { width: 100%; height: 100%; display: block; }
+  .c1 { left: -12px; top: -12px; } .c2 { right: -12px; top: -12px; transform: scaleX(-1); }
+  .c3 { left: -12px; bottom: -12px; transform: scaleY(-1); } .c4 { right: -12px; bottom: -12px; transform: scale(-1); }
+
+  footer { position: relative; z-index: 2; padding: 10px 20px 14px; display: flex; justify-content: center; }
+  .keys { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; font-size: 12px; letter-spacing: .06em; color: var(--dim); }
+  .keys span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .keys b { font-weight: 400; color: var(--bone); margin-left: 4px; }
+
+  .veil { position: fixed; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; background: rgba(4,3,6,.82); backdrop-filter: blur(3px); }
+  .veil.open { display: flex; animation: fadein .35s ease; }
+  @keyframes fadein { from { opacity: 0; } }
+  .book { position: relative; width: min(1040px, 94vw); max-height: 92vh; display: flex; flex-direction: column;
+    background: radial-gradient(900px 500px at 30% 0, rgba(201,164,92,.08), transparent 60%), linear-gradient(#1d1722, #120e17); border: 1px solid var(--gold2);
+    box-shadow: 0 0 0 4px #0a0810, 0 0 0 5px #4a3a22, 0 40px 120px #000, inset 0 0 80px rgba(0,0,0,.6); }
+  .book h2 { margin: 0; font-weight: 400; letter-spacing: .34em; text-transform: uppercase; font-size: 15px; color: var(--gold); padding: 18px 26px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .book h2 button { background: none; border: 0; color: var(--dim); font-size: 24px; cursor: pointer; line-height: 1; font-family: var(--serif); }
+  .book h2 button:hover { color: #fff; }
+  .tabs { display: flex; gap: 2px; padding: 0 26px; border-bottom: 1px solid #3a2f22; flex-wrap: wrap; }
+  .tabs button { font-family: var(--serif); letter-spacing: .18em; text-transform: uppercase; font-size: 11.5px; background: none; color: var(--dim); border: 0; padding: 10px 16px 9px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs button:hover { color: var(--bone); }
+  .tabs button[aria-selected=true] { color: var(--gold); border-bottom-color: var(--gold); text-shadow: 0 0 12px rgba(201,164,92,.5); }
+  .page { display: none; padding: 20px 26px 26px; overflow: auto; font-size: 14.5px; line-height: 1.6; }
+  .page.on { display: block; animation: fadein .25s ease; }
+  .page h3 { margin: 0 0 8px; font-weight: 400; font-size: 13px; letter-spacing: .26em; text-transform: uppercase; color: var(--ember); }
+  .page p { margin: 0 0 12px; color: #cfc4b0; }
+  .page p em { color: var(--bone); font-style: normal; border-bottom: 1px dotted var(--gold2); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 34px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 860px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 5px 0; border-bottom: 1px solid #2a2230; }
+  .row span:first-child { color: var(--bone); }
+  .row span:last-child { color: var(--dim); text-align: right; white-space: nowrap; }
+  .row kbd { margin-left: 3px; }
+  .card { border: 1px solid #3a2f22; background: rgba(0,0,0,.25); padding: 12px 14px 8px 18px; position: relative; }
+  .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c, var(--gold2)); box-shadow: 0 0 14px var(--c, var(--gold2)); }
+  .card h4 { margin: 0 0 2px; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; font-size: 12.5px; color: var(--c, var(--gold)); }
+  .card .tag { font-size: 12px; color: var(--dim); font-style: italic; margin-bottom: 6px; }
+  .card p { font-size: 13px; margin-bottom: 8px; line-height: 1.5; color: #cfc4b0; }
+  .note { margin-top: 14px; padding: 10px 14px; border: 1px dashed #5a4a32; color: var(--dim); font-size: 13px; }
+  .react { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 13.5px; color: #cfc4b0; }
+  .react b { color: var(--teal); font-weight: 400; letter-spacing: .08em; }
+
+  #gate { background: radial-gradient(900px 600px at 50% 40%, rgba(40,24,48,.9), rgba(3,2,5,.97)); flex-direction: column; text-align: center; padding: 20px; overflow: auto; }
+  #gate .big { font-size: clamp(32px, 6vw, 66px); letter-spacing: .5em; text-indent: .5em; text-transform: uppercase; font-weight: 400; margin: 14px 0 4px; color: var(--gold); text-shadow: 0 0 40px rgba(255,154,60,.35), 0 3px 0 #000; animation: flick 6s infinite; }
+  @keyframes flick { 0%,100% { opacity: 1 } 46% { opacity: 1 } 47% { opacity: .82 } 48% { opacity: 1 } 70% { opacity: .93 } }
+  #gate .sub { letter-spacing: .3em; text-transform: uppercase; font-size: 12px; color: var(--dim); margin-bottom: 26px; }
+  #gate .sigil { width: 84px; height: 84px; }
+  #gate .three { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin: 0 0 30px; max-width: 920px; }
+  #gate .three .card { width: 280px; text-align: left; }
+  #gate button.rune { font-size: 15px; padding: 13px 38px 12px; letter-spacing: .3em; border-color: var(--gold); }
+  #gate .small { margin-top: 16px; font-size: 11.5px; letter-spacing: .12em; color: var(--dim); }
+  #gate .small a { color: var(--gold); cursor: pointer; text-decoration: underline dotted; }
+  @media (max-height: 640px) { .brand small { display: none; } header { padding-top: 6px; } .frame { width: min(100%, calc((100vh - 120px) * 16 / 9)); } footer { padding-top: 4px; } }
+</style>
+</head>
+<body>
+<canvas id="embers"></canvas>
+
+<header>
+  <div class="brand">
+    <svg class="sigil" viewBox="0 0 40 40" aria-hidden="true">
+      <g fill="none" stroke="#c9a45c" stroke-width="1.4">
+        <circle cx="20" cy="20" r="17"/><circle cx="20" cy="20" r="12" stroke="#8a6a34"/>
+        <path d="M20 3v8M20 29v8M3 20h8M29 20h8M8 8l5.6 5.6M26.4 26.4L32 32M32 8l-5.6 5.6M13.6 26.4L8 32" stroke-linecap="round"/>
+      </g>
+      <path d="M20 13c3 3 4 5 4 7.5a4 4 0 0 1-8 0c0-2.5 1-4.5 4-7.5z" fill="#ff9a3c"/>
+      <path d="M20 17.5c1.2 1.3 1.7 2.2 1.7 3.2a1.7 1.7 0 0 1-3.4 0c0-1 .5-1.9 1.7-3.2z" fill="#fff0b0"/>
+    </svg>
+    <div><h1>Ashen Hollow</h1><small>A village that remembers</small></div>
+  </div>
+  <nav>
+    <button class="rune" id="btnGuide" title="How to play">How to Play <kbd>F1</kbd></button>
+    <button class="rune" id="btnFull" title="Fullscreen">Fullscreen <kbd>F11</kbd></button>
+  </nav>
+</header>
+
+<main>
+  <div class="frame">
+    <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+    <div id="stage"><canvas id="screen" width="480" height="270" tabindex="0" aria-label="Ashen Hollow game screen"></canvas></div>
+  </div>
+</main>
+
+<footer>
+  <div class="keys" aria-label="Controls">
+    <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><b>move</b></span>
+    <span><kbd>J</kbd> / click<b>strike</b></span>
+    <span><kbd>Space</kbd><b>dodge</b></span>
+    <span><kbd>L</kbd> / right-click<b>cast</b></span>
+    <span><kbd>1</kbd>-<kbd>4</kbd><b>spell</b></span>
+    <span><kbd>E</kbd><b>use</b></span>
+    <span><kbd>V</kbd><b>witchsight</b></span>
+    <span><kbd>I</kbd><b>book</b></span>
+    <span><kbd>Esc</kbd><b>pause</b></span>
+  </div>
+</footer>
+
+<div class="veil open" id="gate" role="dialog" aria-modal="true" aria-label="Welcome">
+  <svg class="sigil" viewBox="0 0 40 40" aria-hidden="true">
+    <g fill="none" stroke="#c9a45c" stroke-width="1"><circle cx="20" cy="20" r="17"/><circle cx="20" cy="20" r="12" stroke="#8a6a34"/>
+    <path d="M20 3v8M20 29v8M3 20h8M29 20h8M8 8l5.6 5.6M26.4 26.4L32 32M32 8l-5.6 5.6M13.6 26.4L8 32" stroke-linecap="round"/></g>
+    <path d="M20 13c3 3 4 5 4 7.5a4 4 0 0 1-8 0c0-2.5 1-4.5 4-7.5z" fill="#ff9a3c"/><path d="M20 17.5c1.2 1.3 1.7 2.2 1.7 3.2a1.7 1.7 0 0 1-3.4 0c0-1 .5-1.9 1.7-3.2z" fill="#fff0b0"/>
+  </svg>
+  <div class="big">Ashen Hollow</div>
+  <div class="sub">Witchcraft &middot; Forgotten gods &middot; A village that remembers</div>
+  <div class="three">
+    <div class="card" style="--c:#ff9a3c"><h4>Fight with timing</h4><p>Enemies telegraph their blows. Strike in a three-hit combo, and <em>dodge</em> to slip through attacks. Dodge a glowing attack at the last instant and time slows.</p></div>
+    <div class="card" style="--c:#7fe0c0"><h4>Choose your craft</h4><p>Five magics, each with its own cost and risk: Necromancy, Druidism, Blood, Astral, Witchcraft. Fuse spells. Break forbidden rites, and pay for it.</p></div>
+    <div class="card" style="--c:#b690e8"><h4>Watch the village</h4><p>People keep routines and secrets. Night, weather and the moon change what walks the land. Come back at dusk.</p></div>
+  </div>
+  <button class="rune" id="btnEnter" autofocus>Enter the Hollow</button>
+  <div class="small">Press <kbd>Enter</kbd> to begin &nbsp;&middot;&nbsp; <a id="gateGuide">read the full guide</a> &nbsp;&middot;&nbsp; <kbd>F1</kbd> opens it any time</div>
+</div>
+
+<div class="veil" id="guide" role="dialog" aria-modal="true" aria-label="How to play">
+  <div class="book">
+    <h2><span>The Wanderer's Primer</span><button id="guideX" aria-label="Close">&times;</button></h2>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-t="t1">Controls</button>
+      <button role="tab" aria-selected="false" data-t="t2">Combat</button>
+      <button role="tab" aria-selected="false" data-t="t3">Magic</button>
+      <button role="tab" aria-selected="false" data-t="t4">The Living World</button>
+      <button role="tab" aria-selected="false" data-t="t5">Advice</button>
+    </div>
+
+    <section class="page on" id="t1">
+      <div class="grid2">
+        <div>
+          <h3>On foot</h3>
+          <div class="row"><span>Move</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows</span></div>
+          <div class="row"><span>Strike (3-hit combo)</span><span><kbd>J</kbd> <kbd>Z</kbd> or left-click</span></div>
+          <div class="row"><span>Dodge roll</span><span><kbd>Space</kbd> <kbd>K</kbd> <kbd>X</kbd></span></div>
+          <div class="row"><span>Cast selected spell</span><span><kbd>L</kbd> <kbd>C</kbd> or right-click</span></div>
+          <div class="row"><span>Choose spell slot</span><span><kbd>1</kbd>-<kbd>4</kbd> or <kbd>Q</kbd>/<kbd>R</kbd></span></div>
+          <div class="row"><span>Use / talk / pick up</span><span><kbd>E</kbd> <kbd>F</kbd></span></div>
+          <div class="row"><span>Hold Witchsight</span><span><kbd>V</kbd></span></div>
+          <div class="row"><span>Aim</span><span>mouse, or the way you face</span></div>
+        </div>
+        <div>
+          <h3>Menus</h3>
+          <div class="row"><span>Inventory</span><span><kbd>I</kbd></span></div>
+          <div class="row"><span>Spellbook &amp; fusion</span><span><kbd>B</kbd></span></div>
+          <div class="row"><span>Skill tree</span><span><kbd>T</kbd></span></div>
+          <div class="row"><span>Map &amp; waystones</span><span><kbd>M</kbd></span></div>
+          <div class="row"><span>Codex (lore found)</span><span><kbd>N</kbd></span></div>
+          <div class="row"><span>Pause / save / settings</span><span><kbd>Esc</kbd> <kbd>P</kbd></span></div>
+          <div class="row"><span>Change tab in the book</span><span><kbd>Q</kbd> <kbd>R</kbd> <kbd>Tab</kbd></span></div>
+          <div class="row"><span>Confirm / back in menus</span><span><kbd>Enter</kbd> / <kbd>Esc</kbd></span></div>
+        </div>
+      </div>
+      <div class="note">A gamepad (left stick to move, face buttons to act) is wired in but has not been tested on real hardware. Every menu works from the keyboard. The game autosaves every few minutes; the pause menu holds three save slots.</div>
+    </section>
+
+    <section class="page" id="t2">
+      <div class="grid2">
+        <div>
+          <h3>Rhythm</h3>
+          <p>Your sickle swings in a three-hit combo. Every swing has a wind-up, a lunge and a recovery, so a swing at the wrong moment is how you get hurt. Blows land with hit-stop, knockback and screen shake.</p>
+          <h3>Dodge</h3>
+          <p>The dodge roll has invulnerability frames. Roll <em>through</em> an attack, not away from it. Dodge a telegraphed blow at the last instant and time slows briefly: a perfect dodge.</p>
+          <h3>Witchsight</h3>
+          <p>Hold <kbd>V</kbd>. Cones show what each watcher can see (red when hunting), villagers are labelled with what they are doing, and things that answer to a hand glow. Free to use. Use it to sneak, and to learn the village's habits.</p>
+          <h3>Read the ground</h3>
+          <p>Strong attacks paint a warning on the floor first. The bosses build their fights from these. Learn the shapes: rings, columns, silence zones.</p>
+        </div>
+        <div>
+          <h3>Enemies think</h3>
+          <p>Foes see in a cone and hear noise. They call for help, circle, and take turns: no more than two press you at once. Hounds circle then lunge, wisps keep their distance and fire, sentinels guard behind a tower shield.</p>
+          <h3>Reactions</h3>
+          <div class="react">
+            <b>Impale</b><span>Blood Magic on a rooted foe: heavy damage.</span>
+            <b>Conduct</b><span>Lightning in the rain arcs between wet foes.</span>
+            <b>Ignite</b><span>Fire lights gas and spore clouds, then they explode.</span>
+            <b>Hex echo</b><span>Curses spread to neighbours when the afflicted fall.</span>
+          </div>
+          <div class="note">Guarded foes shrug off frontal blows. Pierce, curse, or get around the shield.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="t3">
+      <p>Pick one discipline at the start and learn others as you find them. Each pays in a different currency and bends a different rule.</p>
+      <div class="grid3">
+        <div class="card" style="--c:#7fe0c0"><h4>Necromancy</h4><div class="tag">Fuel from endings. Command what falls.</div><p>Souls drop from the fallen and are spent to command the dead. Undead yield nothing. Raise a thrall from a corpse to fight beside you.</p></div>
+        <div class="card" style="--c:#8fd06a"><h4>Druidism</h4><div class="tag">Strength drawn from living ground.</div><p>Verdance returns while you stand on grass, moss or in rain, and dies on stone and underground. Root, poison and storm.</p></div>
+        <div class="card" style="--c:#d04050"><h4>Blood Magic</h4><div class="tag">Power paid for in flesh.</div><p>Spells cost your own vitality, and hit harder the closer to death you stand. Bone and spirit do not bleed.</p></div>
+        <div class="card" style="--c:#7fa6ff"><h4>Astral Magic</h4><div class="tag">Distance, delay and inevitability.</div><p>Aether recovers slowly, faster beneath open night sky. Casts are slow, and being struck breaks them. Blinks and singularities.</p></div>
+        <div class="card" style="--c:#c27be0"><h4>Witchcraft</h4><div class="tag">Patience, preparation, a long memory.</div><p>Spells consume reagents you gather or brew at a cauldron. Curses linger and spread; nothing is instant.</p></div>
+        <div class="card" style="--c:#ff9a3c"><h4>Fusion &amp; taint</h4><div class="tag">Where it gets dangerous.</div><p>Merge two spells in the spellbook (it burns Soul Ash). Forbidden rites are powerful, and their price is permanent: taint and lost vitality. Taint changes you.</p></div>
+      </div>
+    </section>
+
+    <section class="page" id="t4">
+      <div class="grid2">
+        <div>
+          <h3>Time</h3>
+          <p>One in-game hour passes in 45 seconds. Dawn, dusk, night and weather change the light, the sound, who is awake and what hunts. Every seventh night the moon rises red.</p>
+          <h3>People</h3>
+          <p>Villagers walk routines: gardens by day, hearths at dusk, shelter when it rains. They hold motives and secrets, and say more if you come back at the right hour. Some things they will never explain.</p>
+        </div>
+        <div>
+          <h3>Places</h3>
+          <p>The hamlet is the hub. Beyond it lie a forbidden forest with older powers, and the crypts beneath the chapel. Touch waystones to attune them; they become travel points on the map (<kbd>M</kbd>).</p>
+          <h3>Return visits</h3>
+          <p>Creatures return after a couple of days. Some happenings occur only at night, or on one night. Altars, bells and stones answer to the right hour and the right hand. Not every mystery is solved by the end.</p>
+        </div>
+      </div>
+      <div class="note">There is more than one way to end the great fight in the crypts, and an optional guardian in the wood that need not die.</div>
+    </section>
+
+    <section class="page" id="t5">
+      <div class="grid2">
+        <div>
+          <h3>First hour</h3>
+          <p>Walk the hamlet. Talk to everyone, and then talk to them again later. Read what you find with <kbd>E</kbd>. Pick up reagents and herbs; they feed spells and brews.</p>
+          <h3>Staying alive</h3>
+          <p>Fight one enemy at a time, back off when two are near, and keep stamina for dodging.</p>
+        </div>
+        <div>
+          <h3>Using the dark</h3>
+          <p>Your lantern lights only so far, and enemies may see farther than you do at night. Rain muffles sound and fog narrows sight; both help a patient hunter.</p>
+          <h3>If you are stuck</h3>
+          <p>The Codex (<kbd>N</kbd>) keeps what you have learned, and the map (<kbd>M</kbd>) marks places you have seen. Some doors answer to the hour, not to a key.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>window.AH = { };</script>
+<script src="src/core/util.js"></script>
+<script src="src/core/font.js"></script>
+<script src="src/core/input.js"></script>
+<script src="src/core/audio.js"></script>
+<script src="src/core/sprites.js"></script>
+<script src="src/core/particles.js"></script>
+<script src="src/core/lighting.js"></script>
+<script src="src/core/weather.js"></script>
+<script src="src/game/art.js"></script>
+<script src="src/game/tiles.js"></script>
+<script src="src/game/props.js"></script>
+<script src="src/data/icons.js"></script>
+<script src="src/data/items.js"></script>
+<script src="src/data/spells.js"></script>
+<script src="src/data/skills.js"></script>
+<script src="src/data/lore.js"></script>
+<script src="src/data/enemies.js"></script>
+<script src="src/data/maps.js"></script>
+<script src="src/data/dialogue.js"></script>
+<script src="src/game/combat.js"></script>
+<script src="src/game/state.js"></script>
+<script src="src/game/player.js"></script>
+<script src="src/game/enemy.js"></script>
+<script src="src/game/boss.js"></script>
+<script src="src/game/magic.js"></script>
+<script src="src/game/objects.js"></script>
+<script src="src/game/life.js"></script>
+<script src="src/game/world.js"></script>
+<script src="src/ui/skin.js"></script>
+<script src="src/ui/hud.js"></script>
+<script src="src/ui/screens.js"></script>
+<script src="src/main.js"></script>
+<script src="src/shell.js"></script>
+</body>
+</html>
