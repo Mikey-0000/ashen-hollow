@@ -259,9 +259,9 @@
 
   const SKIN = { fair: tones('#e8c8b0'), warm: tones('#d8a888'), tan: tones('#c68e6a'), pale: tones('#ecdcd4'), bone: tones('#e6dfcf'), ghost: tones('#d4e6f4') };
   const HERO = {
-    skin: SKIN.fair, hair: ['#f0eef6', '#bab8cc', '#7c7a94'], style: 'short', eyes: '#17121a', eyeGlow: '#6ad0ff',
-    cloth: ['#4a7088', '#2f4c60', '#1c2f3d'], len: 'coat', trim: ['#6a5a3a', '#4a3e28', '#33291a'], under: '#d8cdb8', pants: ['#3a3440', '#2a2630', '#1c1a22'], boots: ['#5a4636', '#3a2c22', '#241a14'],
-    cape: ['#34406a', '#262f52', '#181d38'], capeLen: 23, pauldron: ['#9a9fac', '#666b78', '#3e424e'], scarf: ['#ffc060', '#e8962e', '#9a5a18'], scarfTail: true, belt: ['#6a4a30', '#4a3222', '#2e1e14'], buckle: '#f0c860', pouch: ['#7a5a38', '#5a4028', '#3a281a'], cuff: ['#8a6a40', '#6a5030', '#4a3620'],
+    skin: SKIN.fair, hair: ['#a8553a', '#7a3a28', '#4a2218'], style: 'braid', eyes: '#17121a', eyeGlow: '#6ad0ff', stretch: -1,
+    cloth: ['#4a7088', '#2f4c60', '#1c2f3d'], len: 'long', trim: ['#6a5a3a', '#4a4028', '#33291a'], under: '#d8cdb8', pants: ['#3a3440', '#2a2630', '#1c1a22'], boots: ['#5a4636', '#3a2c22', '#241a14'],
+    cape: ['#34406a', '#262f52', '#181d38'], capeLen: 23, scarf: ['#ffc060', '#e8962e', '#9a5a18'], scarfTail: true, belt: ['#6a4a30', '#4a3222', '#2e1e14'], buckle: '#f0c860', pouch: ['#7a5a38', '#5a4028', '#3a281a'], cuff: ['#8a6a40', '#6a5030', '#4a3620'],
   };
   Art.hero = build(HERO);
   Art.heroSpec = HERO;
