@@ -74,14 +74,14 @@
     b.globalCompositeOperation = 'multiply'; b.drawImage(b.canvas, 0, 0); b.drawImage(b.canvas, 0, 0);          /* keep only what is very bright */
     const c = small(2, W >> 3, H >> 3); q(c, b.canvas); const d = small(3, W >> 4, H >> 4); q(d, c.canvas);
     g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = true; g.globalCompositeOperation = 'lighter';
-    const k = calm() ? 0.6 : 1; g.globalAlpha = 0.34 * k; g.drawImage(b.canvas, 0, 0, W, H); g.globalAlpha = 0.4 * k; g.drawImage(c.canvas, 0, 0, W, H); g.globalAlpha = 0.34 * k; g.drawImage(d.canvas, 0, 0, W, H); g.restore();
+    const k = calm() ? 0.6 : 1; g.globalAlpha = 0.11 * k; g.drawImage(b.canvas, 0, 0, W, H); g.globalAlpha = 0.14 * k; g.drawImage(c.canvas, 0, 0, W, H); g.globalAlpha = 0.11 * k; g.drawImage(d.canvas, 0, 0, W, H); g.restore();
     B.cost += performance.now() - t0; if (++B.n >= 150) { if (B.cost / B.n > 6 && AH.SC !== 1) { B.off = true; G().toast('Bloom switched off to keep the game smooth. Re-enable it in Settings if you like.', '#9ab8ff'); } B.cost = 0; B.n = 0; }
   }
 
   /* ---------------------------------------------------------------- 3. LIGHT SHAFTS */
   function shafts(g, time) {
     if (!S().shafts) return; const w = G().world; if (!w || !w.objs) return; const cam = w.cam, W = AH.W, H = AH.H, hour = G().hour, day = hour > 6.5 && hour < 18.2;
-    const tint = day ? '#ffe4a8' : '#8ea8ff', al0 = day ? 0.2 : 0.11;
+    const tint = day ? '#ffe4a8' : '#8ea8ff', al0 = day ? 0.1 : 0.06;
     g.save(); g.globalCompositeOperation = 'lighter';
     w.objs.forEach((o) => {
       if (!o.d || o.d.spr !== 'window') return; const sx = o.x - cam.x, sy = o.y - cam.y; if (sx < -90 || sx > W + 90 || sy < -90 || sy > H + 30) return;
