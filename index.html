@@ -62,6 +62,18 @@
   .tabs button { font-family: var(--serif); letter-spacing: .18em; text-transform: uppercase; font-size: 11.5px; background: none; color: var(--dim); border: 0; padding: 10px 16px 9px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
   .tabs button:hover { color: var(--bone); }
   .tabs button[aria-selected=true] { color: var(--gold); border-bottom-color: var(--gold); text-shadow: 0 0 12px rgba(201,164,92,.5); }
+  .path { counter-reset: st; list-style: none; margin: 0 0 14px; padding: 0; }
+  .path li { counter-increment: st; position: relative; padding: 2px 0 12px 44px; color: #cfc4b0; }
+  .path li::before { content: counter(st); position: absolute; left: 0; top: 0; width: 30px; height: 30px; line-height: 28px; text-align: center; border: 1px solid var(--gold2); color: var(--gold); font-family: var(--serif); background: rgba(0,0,0,.3); }
+  .path li b { display: block; color: var(--bone); font-weight: 400; letter-spacing: .12em; text-transform: uppercase; font-size: 12.5px; margin-bottom: 2px; }
+  .path li .where { color: var(--dim); font-size: 12.5px; }
+  .spoil { border: 1px solid #3a2f22; background: rgba(0,0,0,.22); margin: 0 0 10px; padding: 7px 14px; }
+  .spoil summary { cursor: pointer; color: var(--ember); letter-spacing: .14em; text-transform: uppercase; font-size: 11.5px; }
+  .spoil summary:hover { color: var(--gold); }
+  .spoil p { margin: 8px 0 4px; }
+  .stuck { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .stuck td { border-top: 1px solid #2e251a; padding: 7px 10px 7px 0; vertical-align: top; color: #cfc4b0; }
+  .stuck td:first-child { color: var(--bone); width: 34%; }
   .page { display: none; padding: 20px 26px 26px; overflow: auto; font-size: 14.5px; line-height: 1.6; }
   .page.on { display: block; animation: fadein .25s ease; }
   .page h3 { margin: 0 0 8px; font-weight: 400; font-size: 13px; letter-spacing: .26em; text-transform: uppercase; color: var(--ember); }
@@ -164,6 +176,7 @@
       <button role="tab" aria-selected="false" data-t="t3">Magic</button>
       <button role="tab" aria-selected="false" data-t="t4">The Living World</button>
       <button role="tab" aria-selected="false" data-t="t5">Advice</button>
+      <button role="tab" aria-selected="false" data-t="t6">Your Path</button>
     </div>
 
     <section class="page on" id="t1">
@@ -266,6 +279,42 @@
           <p>The Codex (<kbd>N</kbd>) keeps what you have learned, and the map (<kbd>M</kbd>) marks places you have seen. Some doors answer to the hour, not to a key.</p>
         </div>
       </div>
+    </section>
+
+    <section class="page" id="t6">
+      <p>Ashen Hollow does not hold your hand, which is why this page exists. Nothing here is hidden behind a quest log: the story moves when you talk to people, read what you find, and go where the hamlet's rules say you can. <em>This is the shortest honest road.</em> Open a spoiler only if you are truly stuck.</p>
+      <div class="grid2">
+        <div>
+          <h3>The main road</h3>
+          <ol class="path">
+            <li><b>Walk the hamlet</b>Talk to everyone: Marta, Wren, Corwin and Warden Ilse. Read signs, tablets and notes with <kbd>E</kbd>. Come back at different hours, because people move and say new things. <span class="where">Touch the waystone to heal and save.</span></li>
+            <li><b>Learn the way down</b>Marta tells you the crypts lie under the church. The graveyard gate is locked, and there are two ways past it: the <em>key</em> or the <em>night procession</em>.</li>
+            <li><b>Get into the crypts</b>Brother Aldric, a ghost who appears only after dark, gives you the Crypt Key if you promise to free or end the Abbot. Or wait for about midnight in the hamlet and follow the lights to the church.</li>
+            <li><b>Open the Choir Gate</b>Deep in the catacombs three bells hang in the dark. Read the tablet in that hall, then strike the bells in the order it gives. The gate grinds open.</li>
+            <li><b>Face the Choirmaster</b>Rest at the Choir Hall waystone first. When you step into the hall the doors close and the fight begins. Watch the floor: the bell attacks in rings.</li>
+            <li><b>Decide the choir's fate</b>After the fight you choose: release the choir, take their song, or break the bell. It changes your taint, your rewards and who follows you.</li>
+            <li><b>Leave by the Drowned Road</b>The great gate south of the hamlet opens once the choir's fate is decided. Walk through it to reach the epilogue.</li>
+          </ol>
+          <div class="note">The game saves at waystones and autosaves every few minutes. If you fall, you wake at the last waystone you touched, so touch them often.</div>
+        </div>
+        <div>
+          <h3>Optional roads</h3>
+          <div class="card" style="--c:#8fd06a"><h4>Thornwood and the Warden</h4><div class="tag">Past the river, north of the hamlet</div><p>Marta wants three sprigs of purple wolfsbane from here. She repays you with Briar Salve, which parts the thicket guarding the Warden's grove. The Warden of Thorns can be killed or <em>spared</em>.</p></div>
+          <div class="card" style="--c:#7fa6ff"><h4>The standing stones</h4><div class="tag">Thornwood</div><p>Three carved stones, touched in the right order, open a bridge of old stars to a hidden place.</p></div>
+          <div class="card" style="--c:#d04050"><h4>The blood seal</h4><div class="tag">Beside the church</div><p>A sealed door that opens for a willing hand. It holds a reliquary and costs you a little blood and some taint.</p></div>
+          <div class="card" style="--c:#c27be0"><h4>The Ninth Hearth</h4><div class="tag">Thornwood, the coven's fire</div><p>Vesna and the coven want the Listener heard, not silenced. They are not your enemies, and not quite your friends.</p></div>
+          <div class="card" style="--c:#ff9a3c"><h4>Shrines, sigils and the cage</h4><div class="tag">Every area</div><p>Pray at the shrine near the start to imbue your weapon, hold <kbd>V</kbd> to find hidden sigils, and look into the caged lady if you want a choice to make.</p></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:14px">Stuck? Read only what you need</h3>
+      <details class="spoil"><summary>I cannot get into the crypts</summary><p>Two ways. Speak to Aldric after dark and promise to help his brother (the key opens the locked iron gate in the graveyard, which leads down). Or be in the hamlet between roughly 23:25 and 23:55 and follow the procession of lights to the church altar, which opens a stair.</p></details>
+      <details class="spoil"><summary>I cannot open the Choir Gate</summary><p>Strike the three bells in this order: the <em>low</em> one, then the <em>high</em> one, then the <em>middle</em> one. Hit them with a weapon or a spell. If you slip, keep striking: only the last three notes count.</p></details>
+      <details class="spoil"><summary>The thicket and the thorns block me</summary><p>Finish Marta's errand and rub the Briar Salve on the thicket. A druid can also open it with a druid spell. Thorn patches burn: fire, sparks and lightning clear them, and some guard caches of gear.</p></details>
+      <details class="spoil"><summary>The standing stones do nothing</summary><p>Touch them in the order of the inscription: the hunter, then the crow, then the crown. A wrong touch resets the sequence.</p></details>
+      <details class="spoil"><summary>The rubble between Thornwood and the catacombs</summary><p>An astral spell (a star) knocks it free. If you come from the catacombs side you shove it aside yourself.</p></details>
+      <details class="spoil"><summary>The Choirmaster is too hard</summary><p>Stay out of the rings the bell sends across the floor and strike in the quiet between tolls. Frost slows foes and fire burns them, so imbue your weapon at a shrine before you go. Rest at the Choir Hall waystone if you fall.</p></details>
+      <details class="spoil"><summary>Which ending should I pick?</summary><p>There is no wrong one. <em>Release</em> lifts your taint and gives holy water. <em>Take the song</em> adds taint but binds the choir's wraiths as allies. <em>Break the bell</em> gives you a page of the choir and a quieter, more dangerous silence.</p></details>
     </section>
   </div>
 </div>

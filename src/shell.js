@@ -41,7 +41,7 @@
   $('btnFull').onclick = toggleFull;
   function toggleFull() { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) { /* unsupported */ } }
   document.querySelectorAll('.tabs button').forEach((b) => (b.onclick = () => selectTab(b.dataset.t)));
-  const tabIds = ['t1', 't2', 't3', 't4', 't5'];
+  const tabIds = ['t1', 't2', 't3', 't4', 't5', 't6'];
   function selectTab(id) {
     document.querySelectorAll('.tabs button').forEach((x) => x.setAttribute('aria-selected', x.dataset.t === id ? 'true' : 'false'));
     document.querySelectorAll('.page').forEach((p) => p.classList.toggle('on', p.id === id));
@@ -51,8 +51,8 @@
     if (guide.classList.contains('open')) {
       if (e.code === 'Escape') { e.preventDefault(); closeGuide(); }
       const cur = tabIds.findIndex((id) => $(id).classList.contains('on'));
-      if (e.code === 'ArrowRight') selectTab(tabIds[(cur + 1) % 5]);
-      if (e.code === 'ArrowLeft') selectTab(tabIds[(cur + 4) % 5]);
+      if (e.code === 'ArrowRight') selectTab(tabIds[(cur + 1) % 6]);
+      if (e.code === 'ArrowLeft') selectTab(tabIds[(cur + 5) % 6]);
       return;
     }
     if (gate.classList.contains('open') && (e.code === 'Enter' || e.code === 'Space')) { e.preventDefault(); enter(); }
