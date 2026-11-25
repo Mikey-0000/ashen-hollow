@@ -41,7 +41,7 @@
       const spr = this.frame(sun.time); if (!spr) return;
       const sx = this.x - cam.x, sy = this.y - cam.y; if (sx < -90 || sx > W + 90 || sy < -30 || sy > H + 120) return;
       g.save(); const K = AH.SC || 1; g.setTransform(K, 0, sun.k * K, -sun.len * K, Math.round(sx) * K, Math.round(sy) * K); g.globalAlpha = sun.alpha;
-      g.drawImage(S.sil(spr, '#000000'), -spr.ax, -spr.ay); g.restore(); g.globalAlpha = 1;
+      g.drawImage(S.sil(spr, '#000000'), -spr.ax, -spr.ay, spr.w, spr.h); g.restore(); g.globalAlpha = 1;
     }
     interactable() { return !this.hidden && this.d.act && !this.taken; }
   }

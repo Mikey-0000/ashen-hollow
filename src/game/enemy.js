@@ -81,7 +81,7 @@
       this.remove = true;
     }
     drawCorpse(g, cam) {
-      const spr = this.sprite(); if (!spr) return; g.save(); g.translate(Math.round(this.x - cam.x), Math.round(this.y - cam.y - 2)); g.rotate(this.facing < 0 ? -Math.PI / 2 : Math.PI / 2); g.globalAlpha = 0.85; g.drawImage(spr.c, -spr.ax, -spr.ay + 2); g.globalAlpha = 1; g.restore();
+      const spr = this.sprite(); if (!spr) return; g.save(); g.translate(Math.round(this.x - cam.x), Math.round(this.y - cam.y - 2)); g.rotate(this.facing < 0 ? -Math.PI / 2 : Math.PI / 2); g.globalAlpha = 0.85; g.drawImage(spr.c, -spr.ax, -spr.ay + 2, spr.w, spr.h); g.globalAlpha = 1; g.restore();
     }
     /* ---------- perception ---------- */
     canSee(p) {
