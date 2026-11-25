@@ -70,7 +70,7 @@
       const moveLen = Math.hypot(ax.x, ax.y);
       /* aim: mouse when active, otherwise move direction / current facing */
       if (!uiBlocked) {
-        if (Input.mouseActive()) { const m = Input.mouse; this.aimA = Math.atan2(m.y - (this.y - 10 - w.cam.y), m.x - (this.x - w.cam.x)); }
+        if (Input.mouseActive()) { const m = AH.Zoom ? AH.Zoom.unmap(Input.mouse) : Input.mouse; this.aimA = Math.atan2(m.y - (this.y - 10 - w.cam.y), m.x - (this.x - w.cam.x)); }
         else if (moveLen > 0.1) this.aimA = U.wrapAng(U.approachAng ? U.approachAng(this.aimA, Math.atan2(ax.y, ax.x), 14 * dt) : Math.atan2(ax.y, ax.x));
         if (moveLen > 0.1 && !Input.mouseActive()) this.aimA = Math.atan2(ax.y, ax.x);
       }
@@ -180,12 +180,12 @@
       const why = this.canPay(sp); if (why) { AH.Audio.sfx('ui_deny'); G.toast('Not enough ' + why + '.', '#b06a6a'); return; }
       if (sp.cost.hp && sp.school === 'blood' && this.hp <= this.costOf(sp).hp + 1) return;
       this.state = 'cast'; this.st = 0; this.castSpell = sp; this.castDone = false; this.castTotal = sp.cast * (sp.school === 'astral' ? 1.25 : 1); this.castAim = { x: this.x + Math.cos(this.aimA) * 80, y: this.y + Math.sin(this.aimA) * 80 };
-      if (Input.mouseActive()) { this.castAim = { x: Input.mouse.x + w_cam().x, y: Input.mouse.y + w_cam().y }; }
+      if (Input.mouseActive()) { this.castAim = { x: (AH.Zoom ? AH.Zoom.unmap(Input.mouse).x : Input.mouse.x) + w_cam().x, y: (AH.Zoom ? AH.Zoom.unmap(Input.mouse).y : Input.mouse.y) + w_cam().y }; }
       AH.Audio.sfx('cast_' + sp.school, { x: this.x, y: this.y, v: 0.8 }); AH.Magic.begin(this, sp);
     }
     stCast(dt, w, ax, moveLen) {
       const sp = this.castSpell; const slow = sp.school === 'astral' ? 0.15 : 0.4; this.vx = ax.x * 78 * slow; this.vy = ax.y * 78 * slow; w.moveEnt(this, this.vx * dt, 0); w.moveEnt(this, 0, this.vy * dt);
-      if (Input.mouseActive()) this.castAim = { x: Input.mouse.x + w.cam.x, y: Input.mouse.y + w.cam.y };
+      if (Input.mouseActive()) this.castAim = { x: (AH.Zoom ? AH.Zoom.unmap(Input.mouse).x : Input.mouse.x) + w.cam.x, y: (AH.Zoom ? AH.Zoom.unmap(Input.mouse).y : Input.mouse.y) + w.cam.y };
       else if (moveLen > 0.1) this.castAim = { x: this.x + ax.x * 90, y: this.y + ax.y * 90 };
       this.face = this.dirFromAim();
       AH.Magic.channel && AH.Magic.channel(this, sp, this.st / this.castTotal, dt);

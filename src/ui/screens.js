@@ -251,7 +251,7 @@
     },
     draw(g, Gm, time) {
       if (Gm.mode === 'title') UI.drawTitleScene(g, title.t); g.fillStyle = 'rgba(5,4,10,0.75)'; g.fillRect(0, 0, W, H); UI.panel(g, 110, 30, 260, 210, { title: 'Settings' }); const rows = this.rows();
-      rows.forEach((r, i) => { const yy = 40 + i * 13, on = i === this.sel; UI.hotr('n' + rows.length, i, 118, yy - 3, 244, 15); if (on) UI.select(g, 118, yy - 3, 244, 15, time); Font.draw(g, r.label, 126, yy, on ? '#fff0c0' : C.ink); if (r.type === 'bar') { UI.bar(g, 258, yy + 1, 90, 5, r.v, '#a88a44', '#e8c670', '#17151d'); } else if (r.type === 'tog') Font.draw(g, r.v ? 'On' : 'Off', 350, yy, r.v ? '#9ae890' : C.dim, { align: 'right' }); else if (r.type === 'opt') Font.draw(g, String(r.v), 350, yy, C.gold, { align: 'right' }); });
+      rows.forEach((r, i) => { const sp = Math.min(13, Math.floor(176 / Math.max(1, rows.length - 1))), yy = 40 + i * sp, on = i === this.sel; UI.hotr('n' + rows.length, i, 118, yy - 3, 244, sp + 1); if (on) UI.select(g, 118, yy - 3, 244, sp + 1, time); Font.draw(g, r.label, 126, yy, on ? '#fff0c0' : C.ink); if (r.type === 'bar') { UI.bar(g, 258, yy + 1, 90, 5, r.v, '#a88a44', '#e8c670', '#17151d'); } else if (r.type === 'tog') Font.draw(g, r.v ? 'On' : 'Off', 350, yy, r.v ? '#9ae890' : C.dim, { align: 'right' }); else if (r.type === 'opt') Font.draw(g, String(r.v), 350, yy, C.gold, { align: 'right' }); });
       Font.draw(g, 'Left/Right adjust   Esc back', 240, 228, '#5a5448', { align: 'center' });
     },
   };
