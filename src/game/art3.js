@@ -3,10 +3,10 @@
   'use strict';
   const AH = window.AH, U = AH.U, Art = AH.Art, rgb = U.hex;
   const CW = 76, CH = 48;
-  function raster() {
+  function raster(CW, CH) {
     const d = new Uint8ClampedArray(CW * CH * 4);
     const R = {
-      d,
+      d, CW, CH,
       set(x, y, c) { x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= CW || y >= CH) return; const a = typeof c === 'string' ? rgb(c) : c, i = (y * CW + x) * 4; d[i] = a[0]; d[i + 1] = a[1]; d[i + 2] = a[2]; d[i + 3] = 255; },
       ell(cx, cy, rx, ry, t, rot) {
         const co = Math.cos(rot || 0), si = Math.sin(rot || 0);
@@ -19,18 +19,19 @@
         const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0)) * 2 || 1;
         for (let i = 0; i <= n; i++) { const k = i / n, x = x0 + (x1 - x0) * k, y = y0 + (y1 - y0) * k; for (let a = 0; a < w; a++) for (let b = 0; b < w; b++) R.set(x - w / 2 + a, y - w / 2 + b, a === 0 ? t[0] : a === w - 1 ? t[2] : t[1]); }
       },
+      rect(x0, y0, w, h, c) { for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) R.set(x0 + x, y0 + y, c); },
     };
     return R;
   }
-  function outline(R) {
-    const d = R.d, out = new Uint8ClampedArray(d);
+  function outline(R, oc) {
+    const CW = R.CW, CH = R.CH, d = R.d, out = new Uint8ClampedArray(d), fix = oc ? rgb(oc) : null;
     for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) { const i = (y * CW + x) * 4; if (d[i + 3]) continue;
-      for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) { if (nx < 0 || ny < 0 || nx >= CW || ny >= CH) continue; const j = (ny * CW + nx) * 4; if (d[j + 3]) { out[i] = d[j] * 0.28 + 6; out[i + 1] = d[j + 1] * 0.24 + 6; out[i + 2] = d[j + 2] * 0.34 + 16; out[i + 3] = 255; break; } } }
+      for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) { if (nx < 0 || ny < 0 || nx >= CW || ny >= CH) continue; const j = (ny * CW + nx) * 4; if (d[j + 3]) { const c = fix || [d[j] * 0.28 + 6, d[j + 1] * 0.24 + 6, d[j + 2] * 0.34 + 16]; out[i] = c[0]; out[i + 1] = c[1]; out[i + 2] = c[2]; out[i + 3] = 255; break; } } }
     d.set(out);
   }
   const FUR = ['#5a5a6c', '#3a3a48', '#20202c'], BONE = ['#ece4d2', '#bdb29a', '#7c7260'], DARK = ['#34343f', '#22222b', '#14141a'];
   function hound(pose) {
-    const R = raster(), dy = pose === 'crouch' ? 7 : pose === 'air' ? -4 : 0, run1 = pose === 'run1', run2 = pose === 'run2', air = pose === 'air', cr = pose === 'crouch';
+    const R = raster(CW, CH), dy = pose === 'crouch' ? 7 : pose === 'air' ? -4 : 0, run1 = pose === 'run1', run2 = pose === 'run2', air = pose === 'air', cr = pose === 'crouch';
     const by = 22 + dy;
     /* far legs first (darker) */
     const leg = (x, ph, far) => { const t = far ? DARK : FUR, sw = air ? (far ? -9 : -7) : cr ? 3 : run1 ? ph * 7 : run2 ? -ph * 7 : 0, lift = (run1 && ph > 0) || (run2 && ph < 0) ? 5 : 0;
@@ -57,4 +58,40 @@
     return { c, w: CW / 2, h: CH / 2, ax: 31 / 2 + 3, ay: 45 / 2, hi: true, _sil: {}, _flip: null };
   }
   Art.hound = { run: [hound('run1'), hound('stand'), hound('run2'), hound('stand')], crouch: hound('crouch'), air: hound('air'), stand: hound('stand') };
+  /* ---- Weeping Choirmaster: an abbot grown into a great bronze bell ---- */
+  const BW = 112, BH = 144, BR = ['#d8aa5c', '#a07a3a', '#5e4220'];
+  function choir(pose) {
+    const R = raster(BW, BH), sway = pose === 'idle2' ? 2 : 0, raise = pose === 'raise', slam = pose === 'slam', kneel = pose === 'kneel';
+    const top = kneel ? 44 : 28, bottom = 130, cx = 56, h = U.hash;
+    for (let y = top + 28; y < bottom; y++) {
+      const t = (y - (top + 28)) / (bottom - top - 28), w = 18 + 34 * Math.pow(t, 0.8) + (t > 0.9 ? 4 : 0);
+      for (let x = -w; x <= w; x++) {
+        const nx = x / w, lit = -nx * 0.7 + (h(x, y, 61) - 0.5) * 0.18 + (Math.floor((x + 99) / 3) % 2 ? 0.04 : 0);
+        let col = lit > 0.38 ? BR[0] : lit > -0.3 ? BR[1] : BR[2];
+        if (Math.abs(y - (bottom - 10)) <= 2 || Math.abs(y - (top + 52)) <= 1) col = lit > 0 ? '#f0c878' : BR[0];
+        R.set(cx + x + sway * (t * 2), y, col);
+      }
+    }
+    for (let i = 0; i < 90; i++) { const x = 28 + Math.floor(h(i, 1, 62) * 56), y = top + 48 + Math.floor(h(i, 2, 62) * 70); if (R.d[((y * BW) + x) * 4 + 3]) { R.set(x, y, '#58765c'); R.set(x + 1, y, '#58765c'); R.set(x, y + 1, '#40584a'); } }
+    R.limb(60, top + 60, 66, top + 80, 2, ['#2a180c', '#1a0f08', '#1a0f08']); R.limb(66, top + 80, 62, top + 96, 2, ['#2a180c', '#1a0f08', '#1a0f08']); R.limb(62, top + 96, 70, top + 112, 2, ['#2a180c', '#1a0f08', '#1a0f08']);
+    R.ell(cx, bottom - 2, 30, 6, ['#2e1c0a', '#180e05', '#0c0702']); R.ell(cx + sway * 4, bottom - 2, 6, 6, BR);
+    R.ell(cx, top + 32, 24, 16, ['#a63a4a', '#74222f', '#481520'], 0.2);
+    for (let x = 36; x <= 76; x += 3) { R.set(x, top + 21 + (x % 6 ? 0 : 2), '#e8c068'); R.set(x + 1, top + 21 + (x % 6 ? 0 : 2), '#c89a40'); }
+    R.rect(52, top + 28, 8, 28, '#e8c068'); R.rect(44, top + 38, 24, 6, '#e8c068'); R.rect(53, top + 29, 2, 26, '#f6d890');
+    const ay = raise ? top - 12 : slam ? top + 56 : top + 44, ax = raise ? 16 : slam ? 16 : 20, AR = ['#cfc8ba', '#9a9488', '#605a4e'];
+    R.limb(36, top + 28, ax, ay, 9, AR); R.limb(76, top + 28, 112 - ax, ay, 9, AR);
+    R.ell(ax, ay, 6, 6, ['#e6dcc4', '#bdb29a', '#7c7260']); R.ell(112 - ax, ay, 6, 6, ['#e6dcc4', '#bdb29a', '#7c7260']);
+    for (let k = -1; k <= 1; k++) { R.limb(ax + k * 3, ay + 4, ax + k * 4, ay + 11, 2, ['#e6dcc4', '#bdb29a', '#7c7260']); R.limb(112 - ax + k * 3, ay + 4, 112 - ax + k * 4, ay + 11, 2, ['#e6dcc4', '#bdb29a', '#7c7260']); }
+    const hy = top + 4;
+    R.ell(cx, hy + 10, 13, 15, ['#f0eadc', '#c8c0aa', '#8a8472'], 0.1);
+    R.rect(46, hy + 6, 8, 7, '#14101a'); R.rect(60, hy + 6, 8, 7, '#14101a'); R.rect(48, hy + 8, 3, 3, '#cfeaff'); R.rect(62, hy + 8, 3, 3, '#cfeaff');
+    for (let t = 0; t < 16; t++) { R.set(49, hy + 13 + t, '#2a3246'); R.set(50, hy + 13 + t, '#3a4660'); R.set(63, hy + 13 + t, '#2a3246'); R.set(64, hy + 13 + t, '#3a4660'); }
+    R.rect(52, hy + 21, 10, 6, '#24141c'); R.rect(55, hy + 27, 3, 3, '#24141c');
+    for (let y = 0; y < 28; y++) { const w = 2 + y * 0.55; for (let x = -w; x <= w; x++) R.set(cx + x, hy - 24 + y, y < 3 ? '#f0cf78' : Math.abs(x) < 2.4 ? '#f0cf78' : x < 0 ? '#a888b8' : '#5e3e7e'); }
+    R.rect(42, hy - 2, 30, 4, '#e0b862'); R.rect(54, hy - 21, 4, 10, '#fff4c0'); R.rect(52, hy - 17, 8, 2, '#fff4c0');
+    outline(R, '#120a0c');
+    const c = U.makeCanvas(BW, BH), g = c.getContext('2d'); g.putImageData(new ImageData(R.d, BW, BH), 0, 0);
+    return { c, w: BW / 2, h: BH / 2, ax: 28, ay: 66, hi: true, _sil: {}, _flip: null };
+  }
+  Art.boss = { idle: [choir('idle'), choir('idle2')], raise: choir('raise'), slam: choir('slam'), kneel: choir('kneel') };
 })();
