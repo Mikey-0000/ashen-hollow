@@ -44,7 +44,7 @@
           /* player buffs ticking into HUD are handled by Player */
           if (!p.dead && G.fade.dir === 0) {
             if (Input.pressed('pause')) { G.screen = 'pause'; SC.pause.sel = 0; SC.pause.sub = null; AH.Audio.sfx('ui_ok'); }
-            ['inventory', 'spells', 'skills', 'map', 'codex'].forEach((k, i) => { if (Input.pressed(k)) AH.UI.openBook(i); });
+            ['inventory', 'spells', 'skills', 'map', 'codex', 'journal'].forEach((k, i) => { if (Input.pressed(k)) AH.UI.openBook(i); });
           }
           if (G.clock - (G.lastAuto || 0) > 180 && !p.dead) { G.lastAuto = G.clock; G.save(0, true); }
         }

@@ -97,23 +97,23 @@
   /* ============================== THE BOOK ============================== */
   const MODN = { maxHp: 'Vitality', maxStam: 'Stamina', stamRegen: 'Stamina regen', speed: 'Move speed', iframes: 'Dodge window', dmgMelee: 'Melee damage', dmgSpell: 'Spell damage', lantern: 'Lantern radius', corruptGain: 'Taint gain', soulCap: 'Soul capacity', soulChance: 'Extra soul chance', verdCap: 'Verdance cap', verdRegen: 'Verdance regen', hpCostMul: 'Blood cost', bleedMul: 'Bleed damage', leech: 'Lifesteal', armor: 'Damage reduction', sight: 'Hidden sight', reagentSave: 'Reagent saving', hexPower: 'Hex power', aetherCap: 'Aether capacity', aetherRegen: 'Aether regen' };
   const fit = (t, mw) => { if (Font.width(t) <= mw) return t; while (t.length > 1 && Font.width(t + '.') > mw) t = t.slice(0, -1); return t + '.'; };
-  const TABS = ['Inventory', 'Spellbook', 'Skills', 'Map', 'Codex'];
+  const TABS = ['Inventory', 'Spellbook', 'Skills', 'Map', 'Codex', 'Journal'];
   const B = (SC.book = { tab: 0, sel: 0, sel2: 0, fuseA: null, codexTab: 0, scroll: 0 });
-  const KEYTAB = { inventory: 0, spells: 1, skills: 2, map: 3, codex: 4 };
+  const KEYTAB = { inventory: 0, spells: 1, skills: 2, map: 3, codex: 4, journal: 5 };
   UI.openBook = function (tab) { const Gm = G(); Gm.screen = 'book'; B.tab = tab; B.sel = 0; B.sel2 = 0; B.fuseA = null; AH.Audio.sfx('page'); };
   SC.book = Object.assign(B, {
     update(dt, Gm) {
       Object.keys(KEYTAB).forEach((k) => { if (I.pressed(k)) { if (B.tab === KEYTAB[k]) { Gm.screen = null; AH.Audio.sfx('ui_back'); return; } B.tab = KEYTAB[k]; B.sel = 0; B.sel2 = 0; AH.Audio.sfx('page'); } });
       if (I.pressed('back') && Gm.screen === 'book') { Gm.screen = null; AH.Audio.sfx('ui_back'); return; }
       if (I.pressed('tabL') && !I.pressed('prev')) { } if (Gm.screen !== 'book') return;
-      if (I.pressed('prev')) { B.tab = (B.tab + 4) % 5; B.sel = 0; B.sel2 = 0; AH.Audio.sfx('page'); } if (I.pressed('next')) { B.tab = (B.tab + 1) % 5; B.sel = 0; B.sel2 = 0; AH.Audio.sfx('page'); }
-      [bookInv, bookSpells, bookSkills, bookMap, bookCodex][B.tab](dt, Gm);
+      if (I.pressed('prev')) { B.tab = (B.tab + 5) % 6; B.sel = 0; B.sel2 = 0; AH.Audio.sfx('page'); } if (I.pressed('next')) { B.tab = (B.tab + 1) % 6; B.sel = 0; B.sel2 = 0; AH.Audio.sfx('page'); }
+      [bookInv, bookSpells, bookSkills, bookMap, bookCodex, (d, G) => B.jx && B.jx.update(d, G)][B.tab](dt, Gm);
     },
     draw(g, Gm, time) {
       g.fillStyle = 'rgba(5,4,10,0.72)'; g.fillRect(0, 0, W, H); const x = 14, y = 22, w = 452, h = 236; UI.panel(g, x, y, w, h, {});
-      TABS.forEach((t, i) => { const tw = 80, tx = x + 6 + i * (tw + 2), on = i === B.tab; UI.hotr('tab', i, tx, y - 11, tw, 12); g.fillStyle = on ? '#3a3040' : '#17151d'; g.fillRect(tx, y - 11, tw, 12); g.fillStyle = on ? C.gold : C.iron; g.fillRect(tx, y - 11, tw, 1); g.fillRect(tx, y - 11, 1, 12); g.fillRect(tx + tw - 1, y - 11, 1, 12); Font.draw(g, t, tx + tw / 2, y - 8, on ? C.gold : C.dim, { align: 'center', shadow: false }); });
+      TABS.forEach((t, i) => { const tw = 70, tx = x + 6 + i * (tw + 2), on = i === B.tab; UI.hotr('tab', i, tx, y - 11, tw, 12); g.fillStyle = on ? '#3a3040' : '#17151d'; g.fillRect(tx, y - 11, tw, 12); g.fillStyle = on ? C.gold : C.iron; g.fillRect(tx, y - 11, tw, 1); g.fillRect(tx, y - 11, 1, 12); g.fillRect(tx + tw - 1, y - 11, 1, 12); Font.draw(g, t, tx + tw / 2, y - 8, on ? C.gold : C.dim, { align: 'center', shadow: false }); });
       Font.draw(g, 'Q/R tabs   Esc close', x + w - 10, y + h - 11, '#5a5448', { align: 'right' });
-      [drawInv, drawSpells, drawSkills, drawMap, drawCodex][B.tab](g, Gm, time, x, y, w, h);
+      [drawInv, drawSpells, drawSkills, drawMap, drawCodex, (a, b, c, d, e, f, h2) => B.jx && B.jx.draw(a, b, c, d, e, f, h2)][B.tab](g, Gm, time, x, y, w, h);
     },
   });
   /* ---- inventory ---- */
