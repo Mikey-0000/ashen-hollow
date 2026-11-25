@@ -10,7 +10,7 @@
     if (P.list.length >= MAX) return null;
     const p = { x: o.x, y: o.y, z: o.z || 0, vx: o.vx || 0, vy: o.vy || 0, vz: o.vz || 0, ax: o.ax || 0, ay: o.ay || 0, g: o.g || 0, drag: o.drag || 0,
       life: o.life || 1, max: o.life || 1, size: o.size || 1, size2: o.size2 === undefined ? o.size || 1 : o.size2, c: o.c || '#fff', c2: o.c2 || null,
-      add: !!o.add, wob: o.wob || 0, ph: Math.random() * 6.28, bounce: o.bounce || 0, ground: o.ground || 0, fade: o.fade === undefined ? 1 : o.fade, ring: !!o.ring, sy: o.sy || 1 };
+      add: !!o.add, wob: o.wob || 0, ph: Math.random() * 6.28, bounce: o.bounce || 0, ground: o.ground || 0, fade: o.fade === undefined ? 1 : o.fade, ring: !!o.ring, sy: o.sy || 1, streak: o.streak || 0 };
     P.list.push(p); return p;
   };
   const n = (v) => Math.max(1, Math.round(v * P.density));
@@ -21,7 +21,7 @@
       const a = o.dir !== undefined ? o.dir + (Math.random() - 0.5) * (o.spread === undefined ? 1 : o.spread) : Math.random() * Math.PI * 2;
       const s = U.rr(o.min || 20, o.max || 60);
       P.emit({ x: x + U.rr(-(o.jit || 0), o.jit || 0), y: y + U.rr(-(o.jit || 0), o.jit || 0), z: o.z || 0, vx: Math.cos(a) * s, vy: Math.sin(a) * s * (o.flat || 1), vz: o.vz ? U.rr(o.vz[0], o.vz[1]) : 0, g: o.g || 0, drag: o.drag === undefined ? 2 : o.drag,
-        life: U.rr(o.life ? o.life[0] : 0.3, o.life ? o.life[1] : 0.7), size: o.size || 1, size2: o.size2, c: Array.isArray(o.c) ? U.pick(o.c) : o.c || '#fff', c2: o.c2, add: o.add, ground: o.ground, bounce: o.bounce });
+        life: U.rr(o.life ? o.life[0] : 0.3, o.life ? o.life[1] : 0.7), size: o.size || 1, size2: o.size2, c: Array.isArray(o.c) ? U.pick(o.c) : o.c || '#fff', c2: o.c2, add: o.add, streak: o.streak, ground: o.ground, bounce: o.bounce });
     }
   };
   /* themed presets */
@@ -56,6 +56,7 @@
       const s = U.lerp(p.size, p.size2, k);
       g.globalAlpha = pa * (p.fade ? Math.min(1, (1 - k) * 2.2) : 1);
       g.fillStyle = p.c2 && k > 0.5 ? p.c2 : p.c;
+      if (p.streak) { g.strokeStyle = g.fillStyle; g.lineWidth = 1; g.beginPath(); g.moveTo(sx, sy); g.lineTo(Math.round(sx - p.vx * p.streak), Math.round(sy - (p.vy - p.vz) * p.streak)); g.stroke(); continue; }
       if (p.ring) { g.strokeStyle = p.c; g.lineWidth = 1; g.beginPath(); g.ellipse(sx, sy, s, s * p.sy, 0, 0, 6.283); g.stroke(); continue; }
       const sz = Math.max(1, Math.round(s)); g.fillRect(sx - (sz >> 1), sy - (sz >> 1), sz, sz);
     }

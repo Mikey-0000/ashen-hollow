@@ -37,7 +37,7 @@
         if (G.hitstop > 0) { G.hitstop -= real; }
         else {
           let ts = 1; if (G.slowmo > 0) { G.slowmo -= real; ts = 0.35; } const d = dt * ts;
-          w.update(d); G.tickClock(d); AH.Weather.update(d, G); AH.Particles.update(d);
+          w.update(d); G.tickClock(d); AH.Weather.update(d, G); if (AH.VFX) AH.VFX.update(d); AH.Particles.update(d);
           AH.Audio.listener.x = p.x; AH.Audio.listener.y = p.y; AH.Audio.ambience({ wind: AH.Weather.wind * 0.6 + (w.def.indoor ? 0 : 0.2), rain: w.def.indoor ? 0 : AH.Weather.rainK, crypt: w.def.indoor ? 1 : 0, night: G.isNight() && !w.def.indoor ? 1 : 0 });
           if (G.bossIntroT > 0) G.bossIntroT -= real;
           /* player buffs ticking into HUD are handled by Player */
@@ -77,7 +77,7 @@
     else if (G.mode === 'charsel') SC.charsel.draw(g, G, time);
     else if (G.mode === 'epilogue') SC.epilogue.draw(g, G, time);
     else if (G.mode === 'play' && G.world) {
-      G.world.draw(g); AH.UI.hud(g, G, time);
+      G.world.draw(g); if (AH.VFX) AH.VFX.post(g); AH.UI.hud(g, G, time);
       if (G.bossIntroT > 0 && G.world.boss) { const a = U.clamp(Math.min(G.bossIntroT, 3 - G.bossIntroT) * 2, 0, 1); g.globalAlpha = a; const big = AH.Font.big(G.world.boss.name.toUpperCase(), 3, '#f6e2a8', '#a87a30', '#1a0e04'); g.drawImage(big, Math.round(W / 2 - big.width / 2), 62); g.globalAlpha = 1; }
       if (G.screen && SC[G.screen]) SC[G.screen].draw(g, G, time);
     }
