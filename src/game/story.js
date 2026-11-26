@@ -105,7 +105,7 @@
       Font.wrap(L, 340).forEach((l, i) => Font.draw(g2, l, W / 2, 70 + i * 11, C.ink, { align: 'center', outline: '#05040a' }));
       fates.forEach((l, i) => { g2.globalAlpha = U.clamp(this.t - 2.2 - i * 0.45, 0, 1) * U.clamp(this.t - 1, 0, 1); Font.draw(g2, l, W / 2, 110 + i * 12.5, i % 2 ? '#b8aa90' : '#d4c8a8', { align: 'center', outline: '#05040a' }); });
       g2.globalAlpha = U.clamp(this.t - 1, 0, 1);
-      Font.draw(g2, 'End of the vertical slice. Thank you for playing.', W / 2, 200, C.gold, { align: 'center', outline: '#05040a' });
+      Font.draw(g2, 'The road goes on, and so do they.', W / 2, 200, C.gold, { align: 'center', outline: '#05040a' });
       Font.draw(g2, 'Level ' + Gm.level + '   Day ' + Gm.day + '   Slain ' + Gm.kills + '   Deaths ' + Gm.deaths, W / 2, 214, C.dim, { align: 'center' });
       if (this.t > 5) Font.draw(g2, '[Enter] return to title', W / 2, 240, '#5a5448', { align: 'center' }); g2.globalAlpha = 1;
     }

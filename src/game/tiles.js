@@ -8,7 +8,7 @@
 
   /* tile ids */
   const ID = (Tiles.ID = {
-    VOID: 0, GRASS: 1, DIRT: 2, COBBLE: 3, MOSS: 4, WATER: 5, FLAG: 6, WOOD: 7, CRYPT: 8, RUNE: 9, CARPET: 10, MUD: 11, BONES: 12, BRIDGE: 13, LEAVES: 14,
+    VOID: 0, GRASS: 1, DIRT: 2, COBBLE: 3, MOSS: 4, WATER: 5, FLAG: 6, WOOD: 7, CRYPT: 8, RUNE: 9, CARPET: 10, MUD: 11, BONES: 12, BRIDGE: 13, LEAVES: 14, ICE: 15, PEAT: 16,
     WALL: 20, CWALL: 21, TIMBER: 22, ROCK: 23, FENCE: 24, HEDGE: 25, TREELINE: 26, DEEP: 27,
   });
   /* terrain info: solid blocks movement, opaque blocks light, mat = footstep material, pri = blend priority */
@@ -22,6 +22,7 @@
   def(ID.RUNE, { mat: 'stone', pri: 6, base: '#2c2a34' }); def(ID.CARPET, { mat: 'wood', pri: 8, base: '#5a2028' });
   def(ID.MUD, { mat: 'dirt', pri: 4, base: '#3a2f26' }); def(ID.BONES, { mat: 'bone', pri: 6, base: '#34303a' });
   def(ID.BRIDGE, { mat: 'wood', pri: 9, base: '#4a3526' }); def(ID.LEAVES, { mat: 'grass', pri: 3, base: '#4a3424' });
+  def(ID.ICE, { mat: 'stone', pri: 5, base: '#5c7b90', slick: true }); def(ID.PEAT, { mat: 'dirt', pri: 3, base: '#2c2f22', boggy: true });
   [ID.WALL, ID.CWALL, ID.TIMBER, ID.ROCK, ID.TREELINE].forEach((i) => def(i, { solid: true, opaque: true, mat: 'stone', pri: 20 }));
   def(ID.FENCE, { solid: true, opaque: false, mat: 'wood', pri: 20 }); def(ID.HEDGE, { solid: true, opaque: true, mat: 'grass', pri: 20 }); def(ID.DEEP, { solid: true, opaque: false, mat: 'water', water: true, pri: 0, base: '#101c22' });
 
@@ -188,6 +189,22 @@
     P.speckle(0, 0, 16, 16, ['#1f3022', '#0a0e0a'], 14, seed); return P.c;
   }
 
+  /* frozen lake ice: pale slabs, hairline cracks, a few glints */
+  function iceTile(seed) {
+    const P = S.painter(T, T), r = rnd(seed * 53), p = ['#6f8ea2', '#5c7b90', '#47657a', '#8fadbf'];
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const n = tn(x, y, seed, 8) * 0.6 + tn(x, y, seed + 5, 4) * 0.4; P.px(x, y, n > 0.64 ? p[3] : n < 0.38 ? p[2] : p[1]); }
+    for (let k = 0; k < 2; k++) { let x = Math.floor(r() * 16), y = Math.floor(r() * 16); for (let i = 0; i < 6 + Math.floor(r() * 4); i++) { P.px(x & 15, y & 15, i % 3 ? '#35566c' : '#b8d4e4'); x += r() < 0.5 ? 1 : 0; y += r() < 0.6 ? 1 : (r() < 0.5 ? -1 : 0); } }
+    for (let i = 0; i < 3; i++) { const x = Math.floor(r() * 15), y = Math.floor(r() * 15); P.px(x, y, '#d4e8f4'); }
+    return P.c;
+  }
+  /* bog peat: dark mottled ground with black puddle glints and tufts of reed */
+  function peatTile(seed) {
+    const P = S.painter(T, T), r = rnd(seed * 71), p = ['#3a3a2a', '#2c2f22', '#20241a', '#4a4a30'];
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const n = tn(x, y, seed, 8) * 0.6 + tn(x, y, seed + 5, 4) * 0.4; P.px(x, y, n > 0.62 ? p[0] : n < 0.4 ? p[2] : p[1]); }
+    for (let i = 0; i < 3; i++) { const x = 1 + Math.floor(r() * 12), y = 2 + Math.floor(r() * 11); P.px(x, y, '#1a2a2e'); P.px(x + 1, y, '#2a4650'); P.px(x + 2, y, '#1a2a2e'); }
+    for (let i = 0; i < 3; i++) { const x = 1 + Math.floor(r() * 14), y = 5 + Math.floor(r() * 9), h = 2 + Math.floor(r() * 3); for (let k = 0; k < h; k++) P.px(x, y - k, k > 1 ? '#7a8a4a' : '#56683a'); }
+    return P.c;
+  }
   /* ---- build the library ---- */
   const lib = (Tiles.lib = {});
   function build() {
@@ -196,6 +213,7 @@
     lib.cobble = [1, 2, 3, 4].map((s) => cobbleTile(s, 'stone')); lib.crypt = [1, 2, 3, 4].map((s) => flagTile(s, 'crypt')); lib.flag = [1, 2, 3, 4].map((s) => flagTile(s, 'flag'));
     lib.cryptCobble = [1, 2].map((s) => cobbleTile(s + 10, 'crypt'));
     lib.wood = [1, 2, 3, 4].map(woodTile); lib.carpet = [1, 2].map(carpetTile); lib.bones = [1, 2, 3, 4].map(bonesTile); lib.rune = [runeTile()]; lib.bridge = [1, 2].map(bridgeTile);
+    lib.ice = [1, 2, 3, 4].map(iceTile); lib.peat = [1, 2, 3].map(peatTile); [5, 6, 7, 8].forEach((q) => { lib.grass.push(groundTile('grass', q)); lib.dirt.push(groundTile('dirt', q)); }); [4, 5].forEach((q) => lib.moss.push(groundTile('moss', q)));
     lib.water = waterFrames(false); lib.deep = waterFrames(true);
     ['stone', 'crypt', 'timber', 'rock'].forEach((k) => { lib['wall_' + k] = { mid: [1, 2, 3].map((s) => wallTile(k, s, false)), cap: [1, 2, 3].map((s) => wallTile(k, s, true)) }; });
     lib.fenceIron = [fenceTile(1, 'iron')]; lib.fenceWood = [fenceTile(2, 'wood')]; lib.hedge = [1, 2, 3].map(hedgeTile); lib.treeline = [1, 2, 3].map(treelineTile);
@@ -208,6 +226,7 @@
       case ID.GRASS: return pickV(lib.grass, x, y); case ID.MOSS: return pickV(lib.moss, x, y); case ID.DIRT: return pickV(lib.dirt, x, y); case ID.MUD: return pickV(lib.mud, x, y);
       case ID.LEAVES: return pickV(lib.leaves, x, y); case ID.COBBLE: return theme === 'crypt' ? pickV(lib.cryptCobble, x, y) : pickV(lib.cobble, x, y); case ID.FLAG: return pickV(lib.flag, x, y);
       case ID.CRYPT: return pickV(lib.crypt, x, y); case ID.WOOD: return pickV(lib.wood, x, y); case ID.CARPET: return pickV(lib.carpet, x, y); case ID.BONES: return pickV(lib.bones, x, y);
+      case ID.ICE: return pickV(lib.ice, x, y); case ID.PEAT: return pickV(lib.peat, x, y);
       case ID.RUNE: return lib.rune[0]; case ID.BRIDGE: return pickV(lib.bridge, x, y);
       case ID.WALL: return pickV(lib.wall_stone[hasWallAbove ? 'mid' : 'cap'], x, y); case ID.CWALL: return pickV(lib.wall_crypt[hasWallAbove ? 'mid' : 'cap'], x, y);
       case ID.TIMBER: return pickV(lib.wall_timber[hasWallAbove ? 'mid' : 'cap'], x, y); case ID.ROCK: return pickV(lib.wall_rock[hasWallAbove ? 'mid' : 'cap'], x, y);
