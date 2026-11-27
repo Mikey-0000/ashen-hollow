@@ -26,8 +26,8 @@
       DAWN.forEach((l, i) => { gx.globalAlpha = U.clamp(st.tp - 1.2 - i * 0.9, 0, 1); Font.draw(gx, l, W / 2, 96 + i * 16, i === 4 ? '#f6e2a8' : '#d4c8a8', { align: 'center', outline: '#05040a' }); });
       gx.globalAlpha = 1; if (st.tp > 7) Font.draw(gx, '[Enter]', W / 2, 250, '#6a6050', { align: 'center' });
     } else if (st.page === 2) { /* credits */
-      const y0 = H + 10 - st.tp * 20;
-      CREDITS.forEach((c, i) => { const y = y0 + i * 18; if (y < -20 || y > H + 10) return; const a = U.clamp(Math.min(y / 40, (H - y) / 40), 0, 1); gx.globalAlpha = a; if (c[1] === 'big') { const b = Font.big(c[0], 3, '#f6e2a8', '#a87a30', '#1a0e04'); gx.drawImage(b, Math.round(W / 2 - b.width / 2), Math.round(y)); } else Font.draw(gx, c[0], W / 2, y, c[1] === 'dim' ? '#7a7062' : '#d4c8a8', { align: 'center', outline: '#05040a' }); });
+      const y0 = H + 10 - st.tp * 20; let acc = 0;
+      CREDITS.forEach((c, i) => { const y = y0 + acc; acc += c[1] === 'big' ? 40 : 18; if (y < -20 || y > H + 10) return; const a = U.clamp(Math.min(y / 40, (H - y) / 40), 0, 1); gx.globalAlpha = a; if (c[1] === 'big') { const b = Font.big(c[0], 3, '#f6e2a8', '#a87a30', '#1a0e04'); gx.drawImage(b, Math.round(W / 2 - b.width / 2), Math.round(y)); } else Font.draw(gx, c[0], W / 2, y, c[1] === 'dim' ? '#7a7062' : '#d4c8a8', { align: 'center', outline: '#05040a' }); });
       gx.globalAlpha = 1; Font.draw(gx, '[Enter] skip', W - 8, H - 12, '#4a4438', { align: 'right' });
     } else { /* THE END */
       const big = Font.big('THE END', 5, '#f6e2a8', '#a87a30', '#1a0e04'); gx.globalAlpha = U.clamp(st.tp, 0, 1); gx.drawImage(big, Math.round(W / 2 - big.width / 2), 18);
@@ -46,7 +46,7 @@
   SC.epilogue.update = function (dt, Gm) {
     this.t += dt; AH.Particles.update(dt); const ok = AH.Input.pressed('confirm');
     if (st.page === 0) { if (this.t > 5 && ok) { st.page = which(Gm) === 'dawn' ? 1 : 2; st.tp = 0; AH.Audio.music('calm'); } }
-    else { st.tp += dt; if (st.page === 1 && st.tp > 7 && ok) { st.page = 2; st.tp = 0; } else if (st.page === 2) { if (st.tp > CREDITS.length * 0.9 + 14 || (ok && st.tp > 1.5)) { st.page = 3; st.tp = 0; mark(which(Gm)); } } else if (st.page === 3 && st.tp > 3 && ok) { st.page = 0; st.tp = 0; this.t = 0; Gm.mode = 'title'; Gm.screen = null; AH.Audio.music('title'); } }
+    else { st.tp += dt; if (st.page === 1 && st.tp > 7 && ok) { st.page = 2; st.tp = 0; } else if (st.page === 2) { if (st.tp > CREDITS.length * 0.9 + 18 || (ok && st.tp > 1.5)) { st.page = 3; st.tp = 0; mark(which(Gm)); } } else if (st.page === 3 && st.tp > 3 && ok) { st.page = 0; st.tp = 0; this.t = 0; Gm.mode = 'title'; Gm.screen = null; AH.Audio.music('title'); } }
   };
   /* arriving at the epilogue always starts from its first page */
   const ge = g && AH.G && AH.G.goEpilogue; if (ge) { AH.G.goEpilogue = function () { st.page = 0; st.tp = 0; SC.epilogue.t = 0; return ge.apply(this, arguments); }; }

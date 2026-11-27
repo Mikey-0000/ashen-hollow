@@ -107,7 +107,7 @@
       g2.globalAlpha = U.clamp(this.t - 1, 0, 1);
       Font.draw(g2, 'The road goes on, and so do they.', W / 2, 200, C.gold, { align: 'center', outline: '#05040a' });
       Font.draw(g2, 'Level ' + Gm.level + '   Day ' + Gm.day + '   Slain ' + Gm.kills + '   Deaths ' + Gm.deaths, W / 2, 214, C.dim, { align: 'center' });
-      if (this.t > 5) Font.draw(g2, '[Enter] return to title', W / 2, 240, '#5a5448', { align: 'center' }); g2.globalAlpha = 1;
+      g2.globalAlpha = 1;
     }
   };
   if (SC && SC.epilogue) SC.epilogue.update = function (dt, Gm) { this.t += dt; AH.Particles.update(dt); if (this.t > 5 && AH.Input.pressed('confirm')) { Gm.mode = 'title'; Gm.screen = null; this.t = 0; AH.Audio.music('title'); } };

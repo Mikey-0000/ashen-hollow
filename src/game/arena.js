@@ -21,7 +21,7 @@
     b.border(ID.CWALL, 3); b.fill(8, 7, 20, 16, C); b.fill(10, 9, 16, 12, F); b.fill(14, 11, 8, 8, CR); b.fill(16, 13, 4, 4, R);
     b.fill(17, 24, 2, 3, F);
     b.exit(17, 28, 2, 1, 'hamlet', 'from_arena'); b.spawn('start', 17, 25, 1); b.spawn('from_hamlet', 17, 25, 1);
-    [[9, 8], [26, 8], [9, 21], [26, 21], [17, 8], [18, 21]].forEach((p) => b.brazier(p[0], p[1]));
+    [[9, 8], [26, 8], [9, 21], [26, 21], [17, 8], [20, 21]].forEach((p) => b.brazier(p[0], p[1]));
     [[12, 4], [16, 4], [20, 4], [24, 4]].forEach((p) => b.torch(p[0], p[1]));
     b.prop('banner', 14, 3, { wall: true }); b.prop('banner', 21, 3, { wall: true });
     b.zone('Arena', 8, 7, 20, 16, { discover: 'The Gauntlet of Ash', xp: 20 });
